@@ -61,18 +61,26 @@ git clone --depth 1 $REPO_URL . 2>/dev/null || {
 
 echo "[3/7] Instalando dependencias del sistema..."
 
+# DEBUG: Mostrar qué se detecta
+echo "   DEBUG: Buscando pkg..."
+echo "      /usr/sbin/pkg existe: $(test -f /usr/sbin/pkg && echo 'SÍ' || echo 'NO')"
+echo "      /usr/local/sbin/pkg existe: $(test -f /usr/local/sbin/pkg && echo 'SÍ' || echo 'NO')"
+echo "      /usr/bin/apt-get existe: $(test -f /usr/bin/apt-get && echo 'SÍ' || echo 'NO')"
+echo ""
+
 # Detectar FreeBSD buscando pkg (más fiable en TrueNAS)
 if test -f /usr/sbin/pkg || test -f /usr/local/sbin/pkg; then
-    echo "   Detectado: FreeBSD/TrueNAS"
+    echo "   ✅ Detectado: FreeBSD/TrueNAS"
     /usr/sbin/pkg install -y python39 py39-pip py39-venv nginx git 2>&1 | grep -E "(Installed|already)" || true
     PY_BIN="python3.9"
 elif test -f /usr/bin/apt-get; then
-    echo "   Detectado: Linux (apt)"
+    echo "   ✅ Detectado: Linux (apt)"
     apt-get update -qq 2>&1 | tail -2
     apt-get install -y python3 python3-pip python3-venv nginx git 2>&1 | grep -E "(Setting up|already)" || true
     PY_BIN="python3"
 else
     echo "❌ No se encontró pkg ni apt. OS no soportado."
+    echo "   Por favor, instala manualmente: pip install -r requirements.txt"
     exit 1
 fi
 
