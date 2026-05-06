@@ -61,22 +61,18 @@ git clone --depth 1 $REPO_URL . 2>/dev/null || {
 
 echo "[3/7] Instalando dependencias del sistema..."
 
-# Detectar SO usando uname (más confiable que buscar binarios)
-OS_TYPE=$(uname -s)
-
-if [ "$OS_TYPE" = "FreeBSD" ]; then
-    # FreeBSD (TrueNAS) - usar pkg explícitamente
-    echo "   Detectado: FreeBSD"
-    /usr/sbin/pkg install -y python39 py39-pip py39-venv nginx git 2>&1 | grep -E "(Installed|already)" || true
+# Intentar FreeBSD primero (más confiable)
+if command -v pkg >/dev/null 2>&1; then
+    echo "   Detectado: FreeBSD/TrueNAS (pkg)"
+    pkg install -y python39 py39-pip py39-venv nginx git 2>&1 | grep -E "(Installed|already)" || true
     PY_BIN="python3.9"
-elif [ "$OS_TYPE" = "Linux" ]; then
-    # Linux/Debian
-    echo "   Detectado: Linux"
+elif command -v apt-get >/dev/null 2>&1; then
+    echo "   Detectado: Linux (apt)"
     apt-get update -qq 2>&1 | tail -2
     apt-get install -y python3 python3-pip python3-venv nginx git 2>&1 | grep -E "(Setting up|already)" || true
     PY_BIN="python3"
 else
-    echo "❌ OS no soportado: $OS_TYPE"
+    echo "❌ No se encontró pkg ni apt. OS no soportado."
     exit 1
 fi
 
