@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/bin/sh
 # vMix Schedule 44 - Instalador Automático desde GitHub para TrueNAS
-# Ejecutar: sudo bash <(curl -fsSL https://raw.githubusercontent.com/ignacentenox/vmix-schedule-44/main/install.sh)
+# Ejecutar: curl -fsSL https://raw.githubusercontent.com/ignacentenox/vmix-schedule-44/main/install.sh | sudo sh
 
 set -e
 
@@ -10,9 +10,9 @@ echo "║     Sistema: TrueNAS / FreeBSD / Linux                       ║"
 echo "╚═══════════════════════════════════════════════════════════════╝"
 
 # Verificar si se ejecuta con sudo
-if [ "$EUID" -ne 0 ]; then 
+if [ "$(id -u)" -ne 0 ]; then 
     echo "ℹ️  Se necesitan permisos de root."
-    echo "   Ejecuta: sudo bash <(curl -fsSL https://raw.githubusercontent.com/ignacentenox/vmix-schedule-44/main/install.sh)"
+    echo "   Ejecuta: curl -fsSL https://raw.githubusercontent.com/ignacentenox/vmix-schedule-44/main/install.sh | sudo sh"
     exit 1
 fi
 
@@ -38,8 +38,8 @@ if [ ! -d "$INSTALL_DIR" ]; then
 fi
 
 rm -f "$INSTALL_DIR/.test" 2>/dev/null || true
-mkdir -p $INSTALL_DIR/{data,logs,frontend}
-cd $INSTALL_DIR
+mkdir -p "$INSTALL_DIR/data" "$INSTALL_DIR/logs" "$INSTALL_DIR/frontend"
+cd "$INSTALL_DIR"
 
 echo "✅ Instalando en: $INSTALL_DIR"
 echo ""
@@ -77,7 +77,7 @@ fi
 echo "[4/7] Creando entorno virtual Python..."
 cd $INSTALL_DIR
 $PY_BIN -m venv venv
-source venv/bin/activate
+. venv/bin/activate
 pip install --upgrade pip 2>&1 | tail -1
 pip install -q -r requirements.txt || {
     echo "⚠️  Error instalando dependencias. Intentando individual..."

@@ -1,103 +1,33 @@
-# vMix Schedule 44 - Web Control Panel
+# vMix Schedule 44
 
-Aplicación profesional de control de vMix con interfaz web moderna. Automatiza la programación de entrada, gestiona tandas publicitarias y controla la reproducción desde cualquier navegador.
+Sistema de programación automática para vMix con interfaz web.
 
-🌐 **Demo:** http://192.168.192.44/ui/
-
----
-
-## ✨ Características
-
-- ✅ **Monitor en tiempo real** - Entrada actual, hora, estado de vMix
-- ✅ **Gestión de eventos** - Programar cambios de entrada por día/hora
-- ✅ **Control automático** - Activar/desactivar automatización con un botón
-- ✅ **Tandas publicitarias** - Ejecutar jingles y spots automáticamente
-- ✅ **Logs en vivo** - Seguimiento de todas las acciones
-- ✅ **API REST** - Integración con sistemas externos
-- ✅ **Interfaz moderna** - Responsive, tema profesional, acceso móvil
-- ✅ **Autostart** - Se reinicia automáticamente con el servidor
-- ✅ **JSON persistencia** - Guardar eventos sin base de datos
-
----
-
-## 🚀 Instalación Rápida (1 línea)
-
-### Opción 1: Instalación Automática (Recomendado)
-
-En la shell de TrueNAS:
+## 🚀 Instalación Rápida (TrueNAS)
 
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/ignaciomanuel/vmix-schedule-44/main/install.sh)
+curl -fsSL https://raw.githubusercontent.com/ignacentenox/vmix-schedule-44/main/install.sh | sudo sh
 ```
 
-Eso es todo. El script:
-- Descarga desde GitHub
-- Instala dependencias (Python, Nginx)
-- Configura servicio automático
-- Inicia aplicación
-- Accesible en http://192.168.192.44/ui/
-
-### Opción 2: Instalación Manual
-
-```bash
-# Clonar repositorio
-git clone https://github.com/ignaciomanuel/vmix-schedule-44.git /opt/vmix-schedule-44
-cd /opt/vmix-schedule-44
-
-# Instalar dependencias
-python3.9 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-
-# Configurar Nginx
-sudo cp deploy/nginx.conf /usr/local/etc/nginx/vmix-schedule-44.conf
-
-# Crear servicio
-sudo cp deploy/vmix-schedule-44.service /etc/systemd/system/
-
-# Iniciar
-sudo systemctl daemon-reload
-sudo systemctl enable vmix-schedule-44
-sudo systemctl start vmix-schedule-44
-sudo systemctl start nginx
-```
-
----
+Acceso: **http://192.168.192.44/ui/**
 
 ## 📋 Requisitos
 
-- **Sistema**: TrueNAS, FreeBSD, o Linux
-- **Python**: 3.9+
-- **Servidor Web**: Nginx (instalado automáticamente)
-- **vMix**: Accesible en red (ej: 192.168.192.140:8098)
+- TrueNAS / FreeBSD / Linux
+- Python 3.9+
+- Nginx
 
----
+## ✨ Características
 
-## 🎯 Uso
+- Monitor en tiempo real
+- Programación de eventos
+- Control automático
+- Tandas publicitarias
+- API REST
+- JSON persistencia
 
-### 1. Abrir Interfaz Web
+## 📖 Documentación
 
-```
-http://192.168.192.44/ui/
-```
-
-### 2. Agregar Evento
-
-- Pestaña "Eventos"
-- Día: `Monday`
-- Hora: `14:30`
-- Input: `1` (número de entrada en vMix)
-- Click "Agregar"
-
-### 3. Activar Automatización
-
-- Click botón `AUTO: OFF` → cambia a `AUTO: ON`
-- Sistema ejecutará eventos automáticamente
-
-### 4. Monitorear
-
-- Pestaña "Logs" muestra todas las acciones en tiempo real
-- Indicador verde/rojo muestra estado de vMix
+Ver archivo `install.sh` para detalles técnicos.
 
 ---
 
