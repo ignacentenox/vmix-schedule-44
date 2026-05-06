@@ -75,15 +75,19 @@ if test -f /usr/sbin/pkg || test -f /usr/local/sbin/pkg; then
     PY_BIN="python3.9"
     USE_VENV=1
 elif test -f /usr/bin/apt-get; then
-    echo "   ⚠️  Detectado: Sistema con apt (No usar en TrueNAS!)"
-    echo "   ⚠️  TrueNAS REQUIERE: sudo pkg install python39 py39-pip nginx git"
-    echo "   ⚠️  O manualmente: pip3 install -r requirements.txt"
-    echo ""
-    echo "❌ ABORTANDO - No se debe usar apt en TrueNAS"
-    exit 1
+    echo "   ⚠️  ADVERTENCIA: Se detectó apt (puede ser TrueNAS o Linux)"
+    echo "   Si estás en TrueNAS, instala: sudo pkg install python39"
+    echo "   Si estás en Linux, proseguiré con apt..."
+    sleep 2
+    
+    # Intentar instalar con apt
+    apt-get update -qq 2>&1 | tail -1
+    apt-get install -y python3 python3-pip python3-venv nginx git 2>&1 | grep -E "(Setting up|Unpacking|already)" || true
+    PY_BIN="python3"
+    USE_VENV=1
 else
-    echo "   ⚠️  No se detectó pkg ni apt. Intentando instalación manual..."
-    # Buscar Python disponible
+    echo "❌ No se encontró pkg ni apt."
+    echo "   Buscando python instalado..."
     if command -v python3.9 >/dev/null 2>&1; then
         echo "   ✅ Encontrado: python3.9"
         PY_BIN="python3.9"
@@ -93,8 +97,9 @@ else
         PY_BIN="python3"
         USE_VENV=0
     else
-        echo "❌ No se encontró python. Instala manualmente:"
+        echo "❌ Python no encontrado. Instala manualmente:"
         echo "   En TrueNAS: sudo pkg install python39"
+        echo "   En Linux: sudo apt-get install python3"
         exit 1
     fi
 fi
