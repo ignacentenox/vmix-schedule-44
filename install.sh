@@ -111,16 +111,40 @@ fi
 
 echo "   Usando: $PIP_CMD"
 
-# Instalar - intentar varias estrategias
+# Instalar dependencias - estrategias secuenciales
 PKGS="flask requests flask-cors gunicorn"
+INSTALL_OK=0
 
-$PIP_CMD install --break-system-packages -q $PKGS 2>/dev/null && echo "   ✅ Instalado (break-system-packages)" || \
-$PIP_CMD install --user -q $PKGS 2>/dev/null && echo "   ✅ Instalado (--user)" || \
-$PIP_CMD install -q $PKGS 2>/dev/null && echo "   ✅ Instalado" || {
-    echo "❌ No se pudo instalar dependencias."
-    echo "   Prueba manualmente: pip3 install flask requests flask-cors gunicorn"
+# Estrategia 1: --break-system-packages (Python 3.11+)
+if [ "$INSTALL_OK" = "0" ]; then
+    if $PIP_CMD install --break-system-packages -q $PKGS 2>/dev/null; then
+        echo "   ✅ Instalado (break-system-packages)"
+        INSTALL_OK=1
+    fi
+fi
+
+# Estrategia 2: --user
+if [ "$INSTALL_OK" = "0" ]; then
+    if $PIP_CMD install --user -q $PKGS 2>/dev/null; then
+        echo "   ✅ Instalado (--user)"
+        INSTALL_OK=1
+    fi
+fi
+
+# Estrategia 3: directo
+if [ "$INSTALL_OK" = "0" ]; then
+    if $PIP_CMD install -q $PKGS 2>/dev/null; then
+        echo "   ✅ Instalado"
+        INSTALL_OK=1
+    fi
+fi
+
+# Estrategia 4: mostrar error completo para diagnóstico
+if [ "$INSTALL_OK" = "0" ]; then
+    echo "❌ Todas las estrategias fallaron. Error completo:"
+    $PIP_CMD install --break-system-packages $PKGS
     exit 1
-}
+fi
 
 # Detectar gunicorn
 GUNICORN_CMD=""
