@@ -60,11 +60,11 @@ git clone --depth 1 $REPO_URL . 2>/dev/null || {
 }
 
 echo "[3/7] Instalando dependencias del sistema..."
-if [ -f /usr/bin/pkg ]; then
-    # FreeBSD (TrueNAS)
-    pkg install -y python39 py39-pip nginx git 2>&1 | grep -E "(Installed|already)" || true
+if [ -f /usr/sbin/pkg ] || [ -f /usr/local/sbin/pkg ]; then
+    # FreeBSD (TrueNAS) - pkg está en /usr/sbin
+    /usr/sbin/pkg install -y python39 py39-pip py39-venv nginx git 2>&1 | grep -E "(Installed|already)" || true
     PY_BIN="python3.9"
-elif [ -f /usr/bin/apt ]; then
+elif command -v apt-get >/dev/null 2>&1; then
     # Linux/Debian
     apt-get update -qq 2>&1 | tail -2
     apt-get install -y python3 python3-pip python3-venv nginx git 2>&1 | grep -E "(Setting up|already)" || true
@@ -75,8 +75,23 @@ else
 fi
 
 echo "[4/7] Creando entorno virtual Python..."
-cd $INSTALL_DIR
-$PY_BIN -m venv venv
+cd "$INSTALL_DIR"
+
+# Detectar Python disponible
+if command -v python3.9 >/dev/null 2>&1; then
+    PY_CMD="python3.9"
+elif command -v python3 >/dev/null 2>&1; then
+    PY_CMD="python3"
+else
+    echo "❌ Python no encontrado. Instalación fallida."
+    exit 1
+fi
+
+echo "   Usando: $PY_CMD"
+$PY_CMD -m venv venv || {
+    echo "❌ Error creando venv. Intenta instalar: sudo pkg install py39-venv"
+    exit 1
+}
 . venv/bin/activate
 pip install --upgrade pip 2>&1 | tail -1
 pip install -q -r requirements.txt || {
