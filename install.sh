@@ -68,46 +68,74 @@ echo "      /usr/local/sbin/pkg existe: $(test -f /usr/local/sbin/pkg && echo 'S
 echo "      /usr/bin/apt-get existe: $(test -f /usr/bin/apt-get && echo 'SÍ' || echo 'NO')"
 echo ""
 
-# Detectar FreeBSD buscando pkg (más fiable en TrueNAS)
+# Detectar FreeBSD buscando pkg
 if test -f /usr/sbin/pkg || test -f /usr/local/sbin/pkg; then
-    echo "   ✅ Detectado: FreeBSD/TrueNAS"
+    echo "   ✅ Detectado: FreeBSD/TrueNAS (con pkg)"
     /usr/sbin/pkg install -y python39 py39-pip py39-venv nginx git 2>&1 | grep -E "(Installed|already)" || true
     PY_BIN="python3.9"
+    USE_VENV=1
 elif test -f /usr/bin/apt-get; then
-    echo "   ✅ Detectado: Linux (apt)"
-    apt-get update -qq 2>&1 | tail -2
-    apt-get install -y python3 python3-pip python3-venv nginx git 2>&1 | grep -E "(Setting up|already)" || true
-    PY_BIN="python3"
-else
-    echo "❌ No se encontró pkg ni apt. OS no soportado."
-    echo "   Por favor, instala manualmente: pip install -r requirements.txt"
+    echo "   ⚠️  Detectado: Sistema con apt (No usar en TrueNAS!)"
+    echo "   ⚠️  TrueNAS REQUIERE: sudo pkg install python39 py39-pip nginx git"
+    echo "   ⚠️  O manualmente: pip3 install -r requirements.txt"
+    echo ""
+    echo "❌ ABORTANDO - No se debe usar apt en TrueNAS"
     exit 1
+else
+    echo "   ⚠️  No se detectó pkg ni apt. Intentando instalación manual..."
+    # Buscar Python disponible
+    if command -v python3.9 >/dev/null 2>&1; then
+        echo "   ✅ Encontrado: python3.9"
+        PY_BIN="python3.9"
+        USE_VENV=0
+    elif command -v python3 >/dev/null 2>&1; then
+        echo "   ✅ Encontrado: python3"
+        PY_BIN="python3"
+        USE_VENV=0
+    else
+        echo "❌ No se encontró python. Instala manualmente:"
+        echo "   En TrueNAS: sudo pkg install python39"
+        exit 1
+    fi
 fi
 
-echo "[4/7] Creando entorno virtual Python..."
+echo "[4/7] Configurando Python..."
 cd "$INSTALL_DIR"
 
-# Detectar Python disponible
-if command -v python3.9 >/dev/null 2>&1; then
-    PY_CMD="python3.9"
-elif command -v python3 >/dev/null 2>&1; then
-    PY_CMD="python3"
+if [ "$USE_VENV" = "1" ]; then
+    # Crear virtual environment
+    echo "   Creando venv..."
+    $PY_BIN -m venv venv || {
+        echo "❌ Error creando venv. Intenta: sudo pkg install py39-venv"
+        exit 1
+    }
+    . venv/bin/activate
+    echo "   ✅ Venv activado"
 else
-    echo "❌ Python no encontrado. Instalación fallida."
-    exit 1
+    # Instalar directo en sistema (sin venv)
+    echo "   ⚠️  Instalando directo en sistema (sin venv)"
+    PIP_CMD="$(which pip3 || which pip)"
+    if [ -z "$PIP_CMD" ]; then
+        echo "❌ pip no encontrado. Instala: sudo pkg install py39-pip"
+        exit 1
+    fi
 fi
 
-echo "   Usando: $PY_CMD"
-$PY_CMD -m venv venv || {
-    echo "❌ Error creando venv. Intenta instalar: sudo pkg install py39-venv"
-    exit 1
-}
-. venv/bin/activate
-pip install --upgrade pip 2>&1 | tail -1
-pip install -q -r requirements.txt || {
-    echo "⚠️  Error instalando dependencias. Intentando individual..."
-    pip install -q flask requests flask-cors gunicorn
-}
+echo "[5/7] Instalando dependencias Python..."
+if [ "$USE_VENV" = "1" ]; then
+    pip install --upgrade pip 2>&1 | tail -1
+    pip install -q -r requirements.txt || {
+        echo "⚠️  Error con requirements.txt, intentando instalar individual..."
+        pip install -q flask requests flask-cors gunicorn
+    }
+else
+    # Sin venv, instalar en sistema
+    $PIP_CMD install --user flask requests flask-cors gunicorn || {
+        echo "⚠️  Error instalando dependencias con --user, intentando sin..."
+        $PIP_CMD install flask requests flask-cors gunicorn
+    }
+fi
+echo "   ✅ Dependencias instaladas"
 
 echo "[5/7] Configurando Nginx..."
 if [ -d /usr/local/etc/nginx ]; then
@@ -133,6 +161,14 @@ elif [ -f "$INSTALL_DIR/nginx.conf" ]; then
 fi
 
 echo "[6/7] Creando servicio systemd..."
+
+# Configurar ExecStart según USE_VENV
+if [ "$USE_VENV" = "1" ]; then
+    EXEC_START="$INSTALL_DIR/venv/bin/gunicorn -b 127.0.0.1:5000 api:app"
+else
+    EXEC_START="$PY_BIN -m gunicorn -b 127.0.0.1:5000 api:app"
+fi
+
 cat > /etc/systemd/system/vmix-schedule-44.service << EOFSVC
 [Unit]
 Description=vMix Schedule 44 - Web API for vMix Automation
@@ -142,7 +178,7 @@ After=network.target
 Type=simple
 User=root
 WorkingDirectory=$INSTALL_DIR
-ExecStart=$INSTALL_DIR/venv/bin/gunicorn -b 127.0.0.1:5000 api:app
+ExecStart=$EXEC_START
 Restart=always
 RestartSec=10
 StandardOutput=append:$INSTALL_DIR/logs/api.log
