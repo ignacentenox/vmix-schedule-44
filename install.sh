@@ -77,87 +77,39 @@ fi
 echo ""
 echo "[4/6] Instalando dependencias Python..."
 
-# Buscar pip o instalarlo con get-pip.py
-PIP_CMD=""
-for pip_try in pip3 pip "$PY_CMD -m pip"; do
-    if $pip_try --version >/dev/null 2>&1; then
-        PIP_CMD="$pip_try"
-        break
-    fi
-done
+PKGS="flask requests flask-cors gunicorn"
+LIB_DIR="$INSTALL_DIR/lib"
+mkdir -p "$LIB_DIR"
 
-if [ -z "$PIP_CMD" ]; then
-    echo "   pip no encontrado, bootstrapeando con get-pip.py..."
-    wget -q -O /tmp/get-pip.py https://bootstrap.pypa.io/get-pip.py || \
+# Verificar si pip module está disponible
+if ! $PY_CMD -m pip --version >/dev/null 2>&1; then
+    echo "   pip module no encontrado, descargando get-pip.py..."
+    wget -q -O /tmp/get-pip.py https://bootstrap.pypa.io/get-pip.py 2>/dev/null || \
     curl -fsSL -o /tmp/get-pip.py https://bootstrap.pypa.io/get-pip.py || {
         echo "❌ No se pudo descargar get-pip.py"
         exit 1
     }
-    $PY_CMD /tmp/get-pip.py --break-system-packages 2>/dev/null || \
-    $PY_CMD /tmp/get-pip.py 2>/dev/null || {
-        echo "❌ No se pudo instalar pip"
-        exit 1
-    }
+    $PY_CMD /tmp/get-pip.py --target="$LIB_DIR" 2>&1 | tail -3
     rm -f /tmp/get-pip.py
-    # Reintentar después de instalar pip
-    if $PY_CMD -m pip --version >/dev/null 2>&1; then
-        PIP_CMD="$PY_CMD -m pip"
-        echo "   ✅ pip instalado"
-    else
-        echo "❌ pip sigue sin funcionar"
-        exit 1
-    fi
 fi
 
-echo "   Usando: $PIP_CMD"
+# Instalar dependencias con --target (no necesita permisos del sistema)
+echo "   Instalando en: $LIB_DIR"
+$PY_CMD -m pip install --target="$LIB_DIR" $PKGS 2>&1 | grep -E "(Successfully|already|error|ERROR)" || true
 
-# Instalar dependencias - estrategias secuenciales
-PKGS="flask requests flask-cors gunicorn"
-INSTALL_OK=0
-
-# Estrategia 1: --break-system-packages (Python 3.11+)
-if [ "$INSTALL_OK" = "0" ]; then
-    if $PIP_CMD install --break-system-packages -q $PKGS 2>/dev/null; then
-        echo "   ✅ Instalado (break-system-packages)"
-        INSTALL_OK=1
-    fi
-fi
-
-# Estrategia 2: --user
-if [ "$INSTALL_OK" = "0" ]; then
-    if $PIP_CMD install --user -q $PKGS 2>/dev/null; then
-        echo "   ✅ Instalado (--user)"
-        INSTALL_OK=1
-    fi
-fi
-
-# Estrategia 3: directo
-if [ "$INSTALL_OK" = "0" ]; then
-    if $PIP_CMD install -q $PKGS 2>/dev/null; then
-        echo "   ✅ Instalado"
-        INSTALL_OK=1
-    fi
-fi
-
-# Estrategia 4: mostrar error completo para diagnóstico
-if [ "$INSTALL_OK" = "0" ]; then
-    echo "❌ Todas las estrategias fallaron. Error completo:"
-    $PIP_CMD install --break-system-packages $PKGS
+# Verificar que flask quedó instalado
+if $PY_CMD -c "import sys; sys.path.insert(0,'$LIB_DIR'); import flask" 2>/dev/null; then
+    echo "   ✅ Dependencias instaladas correctamente"
+else
+    echo "❌ Error instalando dependencias. Salida completa:"
+    $PY_CMD -m pip install --target="$LIB_DIR" $PKGS
     exit 1
 fi
 
-# Detectar gunicorn
-GUNICORN_CMD=""
-for g in gunicorn "$PY_CMD -m gunicorn" "python3 -m gunicorn"; do
-    if command -v gunicorn >/dev/null 2>&1; then
-        GUNICORN_CMD="gunicorn"
-        break
-    fi
-    if $PY_CMD -m gunicorn --version >/dev/null 2>&1; then
-        GUNICORN_CMD="$PY_CMD -m gunicorn"
-        break
-    fi
-done
+# Gunicorn
+GUNICORN_CMD="$PY_CMD -c \"import sys; sys.path.insert(0,'$LIB_DIR'); from gunicorn.app.wsgiapp import run; run()\" -- -b 127.0.0.1:5000"
+# Forma más simple: usar gunicorn como módulo con PYTHONPATH
+GUNICORN_CMD="PYTHONPATH=$LIB_DIR $PY_CMD -m gunicorn"
 if [ -z "$GUNICORN_CMD" ]; then
     GUNICORN_CMD="$PY_CMD -m gunicorn"
 fi
@@ -210,7 +162,8 @@ After=network.target
 Type=simple
 User=root
 WorkingDirectory=$API_DIR
-ExecStart=$GUNICORN_CMD -b 127.0.0.1:5000 $API_MOD:app
+Environment=PYTHONPATH=$LIB_DIR
+ExecStart=$PY_CMD -m gunicorn -b 127.0.0.1:5000 $API_MOD:app
 Restart=always
 RestartSec=10
 StandardOutput=append:$INSTALL_DIR/logs/api.log
