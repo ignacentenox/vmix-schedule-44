@@ -77,18 +77,36 @@ fi
 echo ""
 echo "[4/6] Instalando dependencias Python..."
 
-# Buscar pip
+# Buscar pip o instalarlo con get-pip.py
 PIP_CMD=""
-for pip in pip3 pip; do
-    if command -v "$pip" >/dev/null 2>&1; then
-        PIP_CMD="$pip"
+for pip_try in pip3 pip "$PY_CMD -m pip"; do
+    if $pip_try --version >/dev/null 2>&1; then
+        PIP_CMD="$pip_try"
         break
     fi
 done
+
 if [ -z "$PIP_CMD" ]; then
-    # Intentar instalar pip manualmente
-    $PY_CMD -m ensurepip --upgrade 2>/dev/null || true
-    PIP_CMD="$PY_CMD -m pip"
+    echo "   pip no encontrado, bootstrapeando con get-pip.py..."
+    wget -q -O /tmp/get-pip.py https://bootstrap.pypa.io/get-pip.py || \
+    curl -fsSL -o /tmp/get-pip.py https://bootstrap.pypa.io/get-pip.py || {
+        echo "❌ No se pudo descargar get-pip.py"
+        exit 1
+    }
+    $PY_CMD /tmp/get-pip.py --break-system-packages 2>/dev/null || \
+    $PY_CMD /tmp/get-pip.py 2>/dev/null || {
+        echo "❌ No se pudo instalar pip"
+        exit 1
+    }
+    rm -f /tmp/get-pip.py
+    # Reintentar después de instalar pip
+    if $PY_CMD -m pip --version >/dev/null 2>&1; then
+        PIP_CMD="$PY_CMD -m pip"
+        echo "   ✅ pip instalado"
+    else
+        echo "❌ pip sigue sin funcionar"
+        exit 1
+    fi
 fi
 
 echo "   Usando: $PIP_CMD"
