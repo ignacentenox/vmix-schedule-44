@@ -61,20 +61,12 @@ git clone --depth 1 $REPO_URL . 2>/dev/null || {
 
 echo "[3/7] Instalando dependencias del sistema..."
 
-# Buscar pkg en rutas conocidas de FreeBSD
-PKG_BIN=""
-for path in /usr/sbin/pkg /usr/bin/pkg /usr/local/sbin/pkg /usr/local/bin/pkg; do
-    if [ -x "$path" ]; then
-        PKG_BIN="$path"
-        break
-    fi
-done
-
-if [ -n "$PKG_BIN" ]; then
-    echo "   Detectado: FreeBSD/TrueNAS (pkg en $PKG_BIN)"
-    $PKG_BIN install -y python39 py39-pip py39-venv nginx git 2>&1 | grep -E "(Installed|already)" || true
+# Detectar FreeBSD buscando pkg (más fiable en TrueNAS)
+if test -f /usr/sbin/pkg || test -f /usr/local/sbin/pkg; then
+    echo "   Detectado: FreeBSD/TrueNAS"
+    /usr/sbin/pkg install -y python39 py39-pip py39-venv nginx git 2>&1 | grep -E "(Installed|already)" || true
     PY_BIN="python3.9"
-elif [ -x /usr/bin/apt-get ]; then
+elif test -f /usr/bin/apt-get; then
     echo "   Detectado: Linux (apt)"
     apt-get update -qq 2>&1 | tail -2
     apt-get install -y python3 python3-pip python3-venv nginx git 2>&1 | grep -E "(Setting up|already)" || true
