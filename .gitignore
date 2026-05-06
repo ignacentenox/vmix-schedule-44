@@ -1,0 +1,49 @@
+# Ambiente Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+.env
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Sistema
+.DS_Store
+.AppleDouble
+.LSOverride
+*.log
+
+# Runtime
+*.pid
+*.sock
+*.sqlite3
+data/*.json
+
+# Deploy
+deploy/venv/
+deploy/build/
+deploy/dist/

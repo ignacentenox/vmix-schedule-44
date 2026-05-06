@@ -1,0 +1,185 @@
+╔══════════════════════════════════════════════════════════════════════════╗
+║                                                                          ║
+║     🚀 DEPLOY DESDE TRUENAS - INSTRUCCIONES PASO A PASO                ║
+║                                                                          ║
+║     Ejecuta esto DESDE LA CONSOLA DE TRUENAS                           ║
+║                                                                          ║
+╚══════════════════════════════════════════════════════════════════════════╝
+
+
+OPCIÓN A: DESDE LA INTERFAZ WEB DE TRUENAS
+════════════════════════════════════════════════════════════════════════════
+
+1. Abre http://192.168.192.44 en tu navegador
+2. Haz click en: Sistema → Shell
+3. Copia y pega TODOS estos comandos (uno a uno):
+
+   # Crear directorio
+   mkdir -p /root/vmix-deploy
+   cd /root/vmix-deploy
+
+   # Descargar archivos (si están en un servidor web)
+   # O usar SCP para copiarlos desde tu Mac
+   
+   # Por ahora vamos a crear los archivos directamente
+
+
+OPCIÓN B: DESDE SSH (RECOMENDADO)
+════════════════════════════════════════════════════════════════════════════
+
+1. Abre terminal en tu Mac:
+   
+   ssh truenas_admin@192.168.192.44
+
+   (Password: 44947)
+
+2. Una vez en TrueNAS, ejecuta estos comandos:
+
+   # Crear directorio de trabajo
+   mkdir -p /root/vmix-deploy
+   cd /root/vmix-deploy
+
+   # Crear api.py
+   cat > api.py << 'EOFPYTHON'
+[... CONTENIDO DE api.py ...]
+EOFPYTHON
+
+   # Crear requirements.txt
+   cat > requirements.txt << 'EOFREQ'
+flask>=2.3.0
+requests>=2.31.0
+flask-cors>=4.0.0
+gunicorn>=20.1.0
+EOFREQ
+
+   # Crear nginx.conf
+   cat > nginx.conf << 'EOFNGINX'
+[... CONTENIDO DE nginx.conf ...]
+EOFNGINX
+
+   # Crear deploy.sh
+   cat > deploy.sh << 'EOFDEPLOY'
+[... CONTENIDO DE deploy.sh ...]
+EOFDEPLOY
+
+   # Hacer ejecutable
+   chmod +x deploy.sh
+
+   # EJECUTAR DEPLOY
+   sudo bash deploy.sh
+
+
+OPCIÓN C: VIA SCP DESDE TU MAC (MÁS RÁPIDO)
+════════════════════════════════════════════════════════════════════════════
+
+En tu Mac:
+
+1. Ve a la carpeta de deploy:
+   cd /Users/ignaciomanuelcenteno/Documents/PROG/2025/CANAL44_RCUPLAY/scheduletv/deploy
+
+2. Transfiere los archivos:
+   scp -r . truenas_admin@192.168.192.44:/root/vmix-deploy/
+
+   (Password: 44947)
+
+3. Conecta por SSH:
+   ssh truenas_admin@192.168.192.44
+
+4. En TrueNAS, ejecuta:
+   cd /root/vmix-deploy
+   chmod +x *.sh
+   sudo bash deploy.sh
+
+
+════════════════════════════════════════════════════════════════════════════
+✅ DURANTE LA INSTALACIÓN
+════════════════════════════════════════════════════════════════════════════
+
+El script:
+  ✓ Verificará dependencias del sistema
+  ✓ Instalará Python y Nginx (si no existen)
+  ✓ Creará entorno virtual
+  ✓ Instalará dependencias Python
+  ✓ Configurará Nginx
+  ✓ Creará servicio systemd
+
+Esto toma ~5-10 minutos
+
+
+════════════════════════════════════════════════════════════════════════════
+🎉 DESPUÉS DEL DEPLOY
+════════════════════════════════════════════════════════════════════════════
+
+En TrueNAS (SSH):
+
+1. Iniciar servicios:
+   sudo systemctl start vmix-schedule-44
+   sudo systemctl start nginx
+
+2. Verificar estado:
+   sudo systemctl status vmix-schedule-44
+   sudo systemctl status nginx
+
+3. Habilitar autostart:
+   sudo systemctl enable vmix-schedule-44
+   sudo systemctl enable nginx
+
+
+════════════════════════════════════════════════════════════════════════════
+🌐 ACCEDER A LA APP
+════════════════════════════════════════════════════════════════════════════
+
+Abre en navegador:
+  http://192.168.192.44/ui/
+
+Debe mostrar:
+  • Interfaz oscura con tema profesional
+  • Entrada actual de vMix
+  • Botón de automatización
+  • Monitor de estado
+  • Tabs para agregar eventos
+
+
+════════════════════════════════════════════════════════════════════════════
+🔍 VERIFICAR LOGS
+════════════════════════════════════════════════════════════════════════════
+
+En TrueNAS (SSH):
+
+# Ver logs en vivo
+sudo tail -f /opt/vmix-schedule-44/logs/api.log
+
+# Ver logs de Nginx
+sudo tail -f /var/log/nginx/vmix-schedule-44-error.log
+
+# Estado del servicio
+sudo systemctl status vmix-schedule-44 -l
+
+
+════════════════════════════════════════════════════════════════════════════
+⚡ COMANDOS RÁPIDOS
+════════════════════════════════════════════════════════════════════════════
+
+# Reiniciar todo
+sudo systemctl restart vmix-schedule-44 && sudo systemctl restart nginx
+
+# Ver versión de Python
+python3 --version
+
+# Ver servicios activos
+sudo systemctl list-units --type=service --state=running | grep vmix
+
+# Chequear conectividad a vMix
+curl -s http://192.168.192.140:8098/api/ | head -5
+
+
+════════════════════════════════════════════════════════════════════════════
+
+👉 PRÓXIMO PASO: Ejecuta el deploy desde TrueNAS
+
+   ssh truenas_admin@192.168.192.44
+   (password: 44947)
+   
+   # Luego sigue OPCIÓN B o OPCIÓN C arriba
+
+════════════════════════════════════════════════════════════════════════════

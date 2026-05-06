@@ -1,0 +1,111 @@
+═══════════════════════════════════════════════════════════════════════════════
+                        COPIAR Y PEGAR EN EMAIL
+═══════════════════════════════════════════════════════════════════════════════
+
+ASUNTO: vMix Schedule 44 - Generar .exe para Windows 10/11
+
+────────────────────────────────────────────────────────────────────────────────
+
+Hola,
+
+Te envío la carpeta para generar el .exe del sistema vMix Schedule 44 en tu Windows.
+
+📦 ADJUNTO: scheduletv.zip (o copia por USB/Google Drive)
+
+INSTRUCCIONES (MUY SIMPLE - 3 PASOS):
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1️⃣  DESCOMPRIMIR
+
+   - Descargar el ZIP (o recibir por USB)
+   - Clic derecho → Extraer aquí
+   - Abrir carpeta "scheduletv"
+
+2️⃣  EJECUTAR COMPILADOR (lo importante)
+
+   - En la carpeta "scheduletv"
+   - DOBLE-CLICK en: BUILD_BRANDED.bat
+   
+   → Se abre ventana negra (NORMAL)
+   → El script hace TODO automáticamente (5-10 minutos)
+   → NO CERRAR LA VENTANA
+
+3️⃣  ¡LISTO!
+
+   - Cuando termine presiona cualquier tecla
+   - Ir a: scheduletv/dist/vMix_Schedule_44/
+   - Ahí estará: vMix_Schedule_44.exe (250 MB)
+   - DOBLE-CLICK para ejecutar
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+❓ REQUISITOS:
+
+   ✔️  Windows 10 o Windows 11 (64-bit)
+   ✔️  2 GB RAM
+   ✔️  1 GB libre en disco
+   ✔️  Internet (para descargar dependencias)
+
+   El BUILD_BRANDED.bat descargará e instalará TODO automáticamente.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🚨 SI ALGO FALLA:
+
+❌ "Python no encontrado"
+   → BUILD_BRANDED.bat lo descarga automáticamente
+   → Si falla: https://www.python.org/downloads/
+   → Marca "Add Python to PATH" al instalar
+
+❌ "Antivirus bloquea"
+   → Desactiva antivirus temporalmente
+   → O agrega excepción a carpeta "scheduletv"
+
+❌ ".exe no abre"
+   → Instala Visual C++ Redistributable:
+   → https://support.microsoft.com/help/2977003
+
+❌ Otra cosa
+   → Revisar GENERAR_EXE_WINDOWS.txt en la carpeta
+   → Contacta soporte técnico
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📄 DOCUMENTACIÓN EN LA CARPETA:
+
+   LEER_PRIMERO_PORTABLE_EXE.txt ← Lee esto si necesitas más detalles
+   GENERAR_EXE_WINDOWS.txt       ← Instrucciones detalladas
+   CHECKLIST_WINDOWS.txt         ← Verificación paso a paso
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✨ EL .EXE FINAL:
+
+   Título: "vMix Schedule 44 - Powered by IGNACE"
+   Logo: 44 Contenidos integrado
+   Portabilidad: 100% (puedes copiar a USB, email, etc.)
+   Instalación: Ninguna (ejecutable directo)
+   Funcionalidad: Automatización vMix 100%
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+RESUMEN:
+
+1. Descomprimir
+2. Doble-click BUILD_BRANDED.bat
+3. Esperar 5-10 minutos
+4. ✅ Obtener vMix_Schedule_44.exe
+
+¡Eso es todo!
+
+Cualquier pregunta, avísame.
+
+Saludos,
+[Tu nombre]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+═══════════════════════════════════════════════════════════════════════════════
+                    FIN DEL EMAIL - COPIA Y PEGA ARRIBA
+═══════════════════════════════════════════════════════════════════════════════

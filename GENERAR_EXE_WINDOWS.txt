@@ -1,0 +1,258 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                     🎬 GENERAR .EXE EN WINDOWS 10/11                        ║
+║                      vMix Schedule 44 - Powered by IGNACE                    ║
+║                           Logo: 44 Contenidos                                ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+📋 INSTRUCCIONES PASO A PASO PARA WINDOWS 10/11
+
+═══════════════════════════════════════════════════════════════════════════════
+
+PASO 1: OBTENER LA CARPETA DEL PROYECTO
+────────────────────────────────────────
+
+El usuario en Mac/Linux debe hacer esto:
+
+  1. Ir a: /Users/ignaciomanuelcenteno/Documents/PROG/2025/CANAL44_RCUPLAY/scheduletv/
+  
+  2. Comprimir la carpeta en ZIP (o copiar completa a USB)
+  
+  3. Enviar al usuario de Windows
+
+O simplemente: Copiar la carpeta completa por:
+  ✅ Email (comprimir ZIP)
+  ✅ Google Drive
+  ✅ USB
+  ✅ Dropbox
+
+
+PASO 2: EN WINDOWS 10/11 - PREPARAR
+─────────────────────────────────────
+
+  1. Descomprimir la carpeta "scheduletv" en tu PC
+  
+  2. Abrirla (debe verse así):
+  
+     scheduletv/
+     ├── BUILD_BRANDED.bat           ← IMPORTANTE
+     ├── build_branded.py
+     ├── main_windows.py
+     ├── main.py
+     ├── app_icon.png
+     ├── requirements.txt
+     ├── vMix_Schedule_44_Contenidos_Config.json
+     ├── vMix_Schedule_44_Contenidos_DB.json
+     └── ... (otros archivos)
+
+
+PASO 3: COMPILAR A .EXE (LA PARTE FÁCIL)
+──────────────────────────────────────────
+
+☝️ TODO SE HACE AUTOMÁTICAMENTE
+
+  1. Dentro de la carpeta "scheduletv"
+  
+  2. DOBLE-CLICK en: BUILD_BRANDED.bat
+  
+  3. Se abrirá una ventana negra (terminal)
+  
+  4. El script hará AUTOMÁTICAMENTE:
+     ✅ Descargar Python (si no lo tiene)
+     ✅ Crear entorno virtual
+     ✅ Instalar PySide6, PyInstaller, requests
+     ✅ Convertir PNG → ICO (logo)
+     ✅ Compilar todo a .exe
+     ✅ Generar carpeta "dist"
+  
+  5. ESPERA 5-10 MINUTOS (es normal que tarde)
+  
+  6. Cuando termine, verás:
+     ✅ BUILD_BRANDED.bat ← Press any key to continue
+     
+  7. Presiona cualquier tecla
+
+
+PASO 4: OBTENER EL .EXE
+────────────────────────
+
+Después de compilar:
+
+  1. En la carpeta "scheduletv" aparecerá una carpeta nueva: "dist"
+  
+  2. Abrirla: dist/vMix_Schedule_44/
+  
+  3. Verás el archivo:
+     📦 vMix_Schedule_44.exe    ← ESTE ES EL PROGRAMA
+  
+  4. Puedes:
+     ✅ Ejecutarlo directamente: Doble-click
+     ✅ Copiar la carpeta "vMix_Schedule_44" a otro lugar
+     ✅ Crear acceso directo al .exe en Desktop
+     ✅ Comprimir para distribuir
+
+
+PASO 5: CONFIGURAR PARA vMIX
+──────────────────────────────
+
+  1. Ejecutar: vMix_Schedule_44.exe
+  
+  2. En la interfaz, ingresar:
+     - IP de vMix: 192.168.192.140:8098
+     - IDs de inputs: 14 (entrada), 15 (lista), 16 (cierre)
+  
+  3. Hacer clic en: APLICAR CAMBIOS
+  
+  4. Listo para usar
+
+
+PASO 6: USAR EL PROGRAMA
+─────────────────────────
+
+  1. Activar AUTO: ON (botón verde)
+  
+  2. Agregar eventos:
+     + Click "+ AGREGAR EVENTO"
+     + Seleccionar día y hora
+     + Especificar input vMix
+     + Guardar
+  
+  3. Sistema ejecuta automáticamente a la hora exacta
+  
+  4. Monitorear en vivo (entrada actual + próximos eventos)
+
+
+═══════════════════════════════════════════════════════════════════════════════
+
+⚠️ REQUISITOS MÍNIMOS
+─────────────────────
+
+  ✅ Windows 10 o Windows 11 (64-bit recomendado)
+  ✅ 2 GB RAM mínimo (4 GB recomendado)
+  ✅ 1 GB libre en disco (durante compilación)
+  ✅ 500 MB libre para .exe final
+  ✅ Conexión a internet (para descargar dependencias)
+  ✅ Conexión a vMix en red local
+
+
+🐛 TROUBLESHOOTING
+──────────────────
+
+❌ "Python no encontrado"
+   ➜ BUILD_BRANDED.bat lo descarga automáticamente
+   ➜ Si falla, descarga desde python.org e instala
+   ➜ IMPORTANTE: Marca "Add Python to PATH" durante instalación
+
+❌ "Antivirus bloquea descarga"
+   ➜ Desactiva antivirus temporalmente
+   ➜ O agrega excepción a carpeta "scheduletv"
+
+❌ ".exe no inicia"
+   ➜ Instala Visual C++ Redistributable 2019+
+   ➜ Link: https://support.microsoft.com/help/2977003
+   ➜ Luego reinicia y prueba de nuevo
+
+❌ "Se demora mucho"
+   ➜ Normal, PyInstaller tarda 5-10 minutos
+   ➜ No cierres la ventana
+
+❌ "Error: 'No such file or directory'"
+   ➜ Asegúrate de que app_icon.png esté en la carpeta
+   ➜ Verifica que BUILD_BRANDED.bat está en la raíz
+
+
+✅ VERIFICACIÓN FINAL
+─────────────────────
+
+Después de compilar, verifica que tengas:
+
+  ✅ dist/vMix_Schedule_44/vMix_Schedule_44.exe   (250 MB)
+  ✅ Doble-click abre la interfaz
+  ✅ Título dice: "vMix Schedule 44 - Powered by IGNACE"
+  ✅ Logo 44 Contenidos aparece en la barra de título
+  ✅ Interface oscura con botones de color cyan
+  ✅ Monitor, reloj, pestañas de programación
+
+
+📦 PARA DISTRIBUIR
+──────────────────
+
+Todo lo que necesitas compartir es la carpeta:
+
+  dist/vMix_Schedule_44/
+
+Puedes:
+  ✅ Comprimir en ZIP (80-100 MB comprimido)
+  ✅ Copiar a USB
+  ✅ Enviar por email (en ZIP)
+  ✅ Compartir en Google Drive
+  ✅ Ejecutar directamente desde allí (es portable)
+
+
+🎯 RESUMEN RÁPIDO
+──────────────────
+
+  1. Copiar carpeta "scheduletv" a Windows
+  2. Doble-click en BUILD_BRANDED.bat
+  3. Esperar 5-10 minutos
+  4. ¡Listo! Tienes vMix_Schedule_44.exe
+
+
+═══════════════════════════════════════════════════════════════════════════════
+
+📊 CONTENIDO DEL .EXE FINAL
+────────────────────────────
+
+vMix_Schedule_44.exe incluye TODO:
+
+  ✅ PySide6 (interfaz gráfica)
+  ✅ requests (conexión HTTP)
+  ✅ Python 3.10 runtime
+  ✅ Logo 44 Contenidos
+  ✅ Icono para barra de título
+  ✅ Base de datos JSON (vacía, se crea al usar)
+  ✅ Configuración por defecto
+
+NO necesita instalar nada en la PC.
+
+
+🎉 RESULTADO FINAL
+──────────────────
+
+Un ejecutable profesional:
+
+  ✨ Título: "vMix Schedule 44 - Powered by IGNACE"
+  ✨ Logo: 44 Contenidos integrado
+  ✨ Interfaz: Profesional dark mode
+  ✨ Funcionalidad: 100% automatización TV
+  ✨ Portabilidad: Funciona en cualquier Windows 10/11
+  ✨ Distribución: Fácil (una carpeta o ZIP)
+
+
+═══════════════════════════════════════════════════════════════════════════════
+
+¿PREGUNTAS?
+
+  P: ¿Cuánto tiempo tarda la compilación?
+  R: 5-10 minutos (depende de velocidad PC/internet)
+
+  P: ¿Se puede ejecutar desde USB?
+  R: Sí, es 100% portable
+
+  P: ¿Se pueden cambiar los IDs de inputs?
+  R: Sí, en la interfaz: Panel superior "APLICAR CAMBIOS"
+
+  P: ¿Se guarda la configuración?
+  R: Sí, en JSON (automático)
+
+  P: ¿Es gratis?
+  R: Sí, totalmente
+
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🎬 Powered by IGNACE
+    Branding by 44 Contenidos
+    Versión 1.0 - Mayo 2026
+
+    Instrucciones para generar .EXE en Windows 10/11
+═══════════════════════════════════════════════════════════════════════════════

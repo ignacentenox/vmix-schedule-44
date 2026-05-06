@@ -1,0 +1,326 @@
+╔════════════════════════════════════════════════════════════════╗
+║  ✅ CHECKLIST PARA USUARIO DE WINDOWS 10/11                   ║
+║                                                                ║
+║     vMix Schedule 44 - Generar .EXE                           ║
+║     Powered by IGNACE                                         ║
+║     Logo: 44 Contenidos                                       ║
+╚════════════════════════════════════════════════════════════════╝
+
+
+ANTES DE EMPEZAR
+═════════════════════════════════════════════════════════════════
+
+☐ Recibí la carpeta "scheduletv"
+
+☐ La descomprimí en mi PC
+
+☐ Verifico que contiene estos archivos principales:
+  ☐ BUILD_BRANDED.bat
+  ☐ build_branded.py
+  ☐ main_windows.py
+  ☐ app_icon.png
+  ☐ requirements.txt
+  ☐ vMix_Schedule_44_Contenidos_Config.json
+  ☐ vMix_Schedule_44_Contenidos_DB.json
+
+☐ Tengo Windows 10 o Windows 11 (64-bit)
+
+☐ Tengo al menos 2 GB RAM
+
+☐ Tengo al menos 1 GB libre en disco
+
+☐ Tengo conexión a internet
+
+
+COMPILACIÓN (5-10 MINUTOS)
+═════════════════════════════════════════════════════════════════
+
+PASO 1: Entrar a la carpeta
+─────────────────────────────
+
+☐ Abro explorador de archivos
+
+☐ Voy a la carpeta "scheduletv"
+
+☐ Verifico que veo los archivos
+
+
+PASO 2: Ejecutar el compilador
+──────────────────────────────
+
+☐ DOBLE-CLICK en: BUILD_BRANDED.bat
+
+☐ Se abre una ventana negra (terminal)
+
+☐ Veo que comienza a mostrar mensajes
+
+
+PASO 3: Esperar automáticamente
+────────────────────────────────
+
+La ventana hará lo siguiente (NO CERRAR):
+
+☐ Descarga Python (si no lo tiene)
+  └─ "Collecting python..." (esperar)
+
+☐ Crea entorno virtual
+  └─ "Creating venv..." (esperar)
+
+☐ Instala dependencias
+  └─ "Installing PySide6, PyInstaller..." (esperar)
+
+☐ Convierte logo
+  └─ "Converting PNG to ICO..." (esperar)
+
+☐ Compila a .exe
+  └─ "Compiling with PyInstaller..." (ESTA TARDA MÁS)
+
+TIEMPO TOTAL: 5-10 minutos
+
+⚠️ NORMAL que demora: Es mucho código
+
+
+PASO 4: Completado
+──────────────────
+
+☐ Veo un mensaje como:
+  "✅ COMPILACIÓN EXITOSA" o similar
+
+☐ Veo: "Press any key to continue"
+
+☐ Presiono cualquier tecla
+
+☐ La ventana se cierra
+
+
+DESPUÉS DE COMPILAR
+═════════════════════════════════════════════════════════════════
+
+PASO 5: Verificar que se creó
+──────────────────────────────
+
+☐ Voy a la carpeta "scheduletv"
+
+☐ Veo una carpeta nueva llamada: "dist"
+
+☐ La abro
+
+☐ Dentro veo: "vMix_Schedule_44"
+
+☐ La abro
+
+☐ Dentro encontro: vMix_Schedule_44.exe (250 MB)
+
+
+PASO 6: Probar el .exe
+──────────────────────
+
+☐ DOBLE-CLICK en: vMix_Schedule_44.exe
+
+☐ Se abre la interfaz
+
+☐ Verifico que veo:
+  ☐ Título: "vMix Schedule 44 - Powered by IGNACE"
+  ☐ Logo 44 Contenidos en la barra de título
+  ☐ Interfaz oscura (fondo negro)
+  ☐ Botones de color cyan (#00f2ff)
+  ☐ Botón "EN VIVO"
+  ☐ Botón "AUTO: ON" (en verde)
+  ☐ Reloj digital
+  ☐ Pestañas: PROGRAMACIÓN y TANDAS
+
+☐ El programa abre correctamente
+
+
+CONFIGURAR PARA VMIX
+═════════════════════════════════════════════════════════════════
+
+PASO 7: Ingresar IP de vMix
+────────────────────────────
+
+☐ Abro vMix_Schedule_44.exe
+
+☐ En panel superior, veo campos para:
+  ☐ JINGLE IN: 14
+  ☐ JINGLE OUT: 16
+
+☐ Cambio si es necesario (preguntar a técnico)
+
+☐ Click: APLICAR CAMBIOS
+
+
+PASO 8: Agregar primer evento
+──────────────────────────────
+
+☐ Click: "+ AGREGAR EVENTO"
+
+☐ Se abre diálogo
+
+☐ Especifico:
+  ☐ Hora: (ej: 10:00:00)
+  ☐ Input vMix: (ej: 5)
+
+☐ Click: GUARDAR EVENTO
+
+
+PASO 9: Agregar tanda publicitaria
+───────────────────────────────────
+
+☐ Click en tab: TANDAS / PUBLICIDAD
+
+☐ Click: "+ AGREGAR EVENTO"
+
+☐ Se abre diálogo
+
+☐ Especifico:
+  ☐ Hora: (ej: 10:45:00)
+  ☐ ID Lista vMix: 15
+  ☐ Cantidad de spots: 4
+
+☐ Click: GUARDAR TANDA
+
+
+PASO 10: Activar automatización
+────────────────────────────────
+
+☐ Click en botón: "AUTO: OFF"
+
+☐ El botón cambia a: "AUTO: ON" (verde)
+
+☐ El sistema ahora ejecuta eventos automáticamente
+
+
+VERIFICACIÓN FINAL
+═════════════════════════════════════════════════════════════════
+
+PASO 11: Checklist funcional
+─────────────────────────────
+
+☐ El monitor muestra:
+  ☐ Entrada actual de vMix
+  ☐ Próximo programa
+  ☐ Próxima tanda
+  ☐ Reloj digital
+
+☐ Los datos se guardaron (cerrar y abrir programa)
+
+☐ El archivo .exe se puede ejecutar desde cualquier lugar
+
+☐ Se puede copiar la carpeta a otro lugar
+
+☐ Se puede comprimir en ZIP para distribuir
+
+
+TROUBLESHOOTING
+═════════════════════════════════════════════════════════════════
+
+❌ "Python no encontrado"
+   ☐ BUILD_BRANDED.bat lo descarga automáticamente
+   ☐ Si no: Descargar de https://www.python.org/downloads/
+   ☐ Instalar y marcar "Add Python to PATH"
+   ☐ Reiniciar
+   ☐ Intentar de nuevo
+
+❌ "Antivirus bloquea descarga"
+   ☐ Desactivar antivirus temporalmente
+   ☐ O agregar excepción a carpeta "scheduletv"
+
+❌ "La ventana se cierra rápido"
+   ☐ Ejecutar BUILD_BRANDED.bat desde terminal:
+     - Abrir cmd en la carpeta
+     - Ejecutar: BUILD_BRANDED.bat
+     - Ver mensajes de error
+
+❌ ".exe no abre"
+   ☐ Instalar Visual C++ Redistributable:
+     https://support.microsoft.com/help/2977003
+   ☐ Reiniciar
+   ☐ Intentar de nuevo
+
+❌ "Compilación muy lenta"
+   ☐ Normal: PyInstaller tarda 5-10 minutos
+   ☐ No cerrar la ventana
+   ☐ Tener paciencia
+
+
+DESPUÉS DE OBTENER EL .EXE
+═════════════════════════════════════════════════════════════════
+
+COMPARTIR CON OTROS:
+
+☐ Comprimir carpeta: dist/vMix_Schedule_44/
+  └─ Resultado: ~80-100 MB (ZIP)
+
+☐ Compartir por:
+  ☐ Email
+  ☐ USB
+  ☐ Google Drive
+  ☐ Dropbox
+
+Otros solo necesitan:
+  ☐ Descomprimir
+  ☐ Doble-click en vMix_Schedule_44.exe
+  ☐ ¡Listo!
+
+
+DOCUMENTACIÓN DISPONIBLE
+═════════════════════════════════════════════════════════════════
+
+En la carpeta "scheduletv" encontrarás:
+
+☐ README_EXECUTIVE.md
+  └─ Para jefe (10 min, con ROI)
+
+☐ ONE_PAGE_REFERENCE.txt
+  └─ Referencia rápida (2 min)
+
+☐ README_COMPLETE.md
+  └─ Documentación técnica completa
+
+☐ GENERAR_EXE_WINDOWS.txt
+  └─ Instrucciones detalladas
+
+☐ RESUMEN_FINAL_EXE.md
+  └─ Este checklist
+
+
+SOPORTE
+═════════════════════════════════════════════════════════════════
+
+Si algo no funciona:
+
+☐ Revisar README_COMPLETE.md - Troubleshooting
+☐ Revisar GENERAR_EXE_WINDOWS.txt - Instrucciones
+☐ Contactar al técnico
+☐ Compartir screenshots de errores
+
+
+═══════════════════════════════════════════════════════════════
+
+✅ TODO COMPLETADO
+
+Si llegaste aquí y todo pasó bien:
+
+☑️ .exe compilado ✅
+☑️ Programa funciona ✅
+☑️ Eventos programados ✅
+☑️ AUTO activado ✅
+☑️ Listo para usar ✅
+
+¡Felicitaciones! Ya tienes vMix Schedule 44 funcional.
+
+═══════════════════════════════════════════════════════════════
+
+📞 CONTACTO
+
+Preguntas: Revisar documentación
+Errores: Contactar soporte técnico
+Sugerencias: Contactar desarrollador
+
+═══════════════════════════════════════════════════════════════
+
+🎬 Powered by IGNACE
+    Branding by 44 Contenidos
+    Versión 1.0 - Mayo 2026
+
+═══════════════════════════════════════════════════════════════

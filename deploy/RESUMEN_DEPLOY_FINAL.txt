@@ -1,0 +1,341 @@
+╔════════════════════════════════════════════════════════════════════════╗
+║                                                                        ║
+║         🎬 VMIX SCHEDULE 44 - DEPLOY TRUENAS - RESUMEN FINAL         ║
+║                                                                        ║
+║                 Versión 1.0 | 6 de mayo de 2026                      ║
+║                                                                        ║
+╚════════════════════════════════════════════════════════════════════════╝
+
+
+📦 QUÉ INCLUYE EL DEPLOY
+════════════════════════════════════════════════════════════════════════
+
+✅ Backend Python con Flask (api.py)
+   • API REST con 8 endpoints
+   • Integración con vMix HTTP API
+   • Scheduler automático por día/hora
+   • Gestión de eventos y tandas
+   • Logging en tiempo real
+
+✅ Frontend Web Profesional (index.html)
+   • Interfaz moderna responsive
+   • Tema oscuro con accents cyan (#00f2ff)
+   • Monitor en tiempo real
+   • Control AUTO ON/OFF
+   • Agregar/eliminar eventos
+   • Vista de logs en vivo
+
+✅ Servidor Web Nginx
+   • Reverse proxy a Flask
+   • Servir interfaz web en /ui/
+   • Redirección automática
+   • HTTPS-ready (opcional)
+
+✅ Automatización Completa
+   • Script de instalación todo-en-uno
+   • Configuración systemd
+   • Autostart al reiniciar
+   • Gestión de dependencias
+
+✅ Documentación Extensa
+   • Instrucciones paso a paso
+   • Guía de troubleshooting
+   • Comandos de verificación
+   • Scripts de recuperación
+
+
+🎯 RESULTADO FINAL
+════════════════════════════════════════════════════════════════════════
+
+URL DE ACCESO:        http://192.168.192.44/ui/
+
+ARQUITECTURA:
+   Navegador (http://192.168.192.44/ui/)
+         ↓
+   Nginx (Port 80)
+    ├─ /ui/   → Frontend estático
+    └─ /api/  → Backend Flask (puerto 5000)
+         ↓
+   Python Flask + vMix Integration
+    ├─ Scheduler automático
+    ├─ API REST endpoints
+    └─ JSON persistence
+
+PUERTOS:
+   • 80    → Nginx (frontend + proxy)
+   • 5000  → Flask API (interno)
+
+UBICACIÓN EN SERVIDOR:
+   /opt/vmix-schedule-44/
+   ├── api.py                          (Backend)
+   ├── requirements.txt                (Dependencias)
+   ├── venv/                           (Python virtual env)
+   ├── frontend/
+   │   └── index.html                  (Interfaz web)
+   ├── data/
+   │   ├── vMix_Schedule_44_Contenidos_Config.json
+   │   └── vMix_Schedule_44_Contenidos_DB.json
+   └── logs/
+       └── api.log
+
+
+🚀 PASOS PARA EJECUTAR
+════════════════════════════════════════════════════════════════════════
+
+1️⃣  ACCEDER A TRUENAS SHELL
+    • Abre: http://192.168.192.44
+    • SISTEMA → SHELL
+
+2️⃣  EJECUTAR INSTALACIÓN
+    • Copia TODO el script de INSTRUCCIONES_SHELL_TRUENAS.txt
+    • Pega en shell de TrueNAS
+    • Espera que termine (~5 min)
+
+3️⃣  CONFIGURAR NGINX
+    • Ejecuta comando de configuración Nginx
+    • Reinicia: sudo systemctl restart nginx
+
+4️⃣  CREAR SERVICIO SYSTEMD
+    • Ejecuta comando de servicio
+    • Habilita: sudo systemctl daemon-reload
+
+5️⃣  INICIAR SERVICIOS
+    • sudo systemctl start vmix-schedule-44
+    • sudo systemctl start nginx
+
+6️⃣  VERIFICAR
+    • sudo systemctl status vmix-schedule-44
+    • Abre http://192.168.192.44/ui/
+
+7️⃣  USAR
+    • Agregar eventos por día/hora
+    • Activar AUTO ON
+    • Monitorear en vivo
+
+
+📊 FUNCIONALIDADES
+════════════════════════════════════════════════════════════════════════
+
+✨ MONITOR EN TIEMPO REAL
+   • Entrada actual de vMix
+   • Hora del sistema
+   • Estado AUTO ON/OFF
+   • Indicador conexión vMix
+
+✨ GESTIÓN DE EVENTOS
+   • Agregar eventos programados
+   • Especificar día y hora
+   • Seleccionar input de vMix
+   • Eliminar eventos
+
+✨ CONTROL AUTOMÁTICO
+   • Activar/desactivar automatización
+   • Ejecutar eventos a hora exacta
+   • Sincronización con vMix
+   • Logging de acciones
+
+✨ SISTEMA DE LOGS
+   • Últimas 50 líneas en tiempo real
+   • Historial de eventos ejecutados
+   • Errores y conectividad
+   • Exportable para auditoría
+
+✨ API REST
+   • GET /api/status
+   • GET /api/config
+   • POST /api/config
+   • GET /api/events
+   • POST /api/events
+   • DELETE /api/events/<day>/<idx>
+   • POST /api/auto/toggle
+   • GET /api/logs
+
+
+🔧 COMANDOS ÚTILES
+════════════════════════════════════════════════════════════════════════
+
+# Ver estado de servicios
+sudo systemctl status vmix-schedule-44
+sudo systemctl status nginx
+
+# Reiniciar todo
+sudo systemctl restart vmix-schedule-44
+sudo systemctl restart nginx
+
+# Ver logs en vivo
+sudo tail -f /opt/vmix-schedule-44/logs/api.log
+sudo tail -f /var/log/nginx/vmix-schedule-44-error.log
+
+# Parar servicios
+sudo systemctl stop vmix-schedule-44
+sudo systemctl stop nginx
+
+# Iniciar servicios
+sudo systemctl start vmix-schedule-44
+sudo systemctl start nginx
+
+# Habilitar autostart
+sudo systemctl enable vmix-schedule-44
+sudo systemctl enable nginx
+
+# Deshabilitar autostart
+sudo systemctl disable vmix-schedule-44
+sudo systemctl disable nginx
+
+# Ver versión Python
+python3.9 --version
+
+# Probar API
+curl -s http://127.0.0.1:5000/api/status | python3 -m json.tool
+
+# Probar interfaz
+curl -s http://192.168.192.44/ui/ | head -10
+
+
+⚠️  IMPORTANTE - VERIFICAR ANTES DE USAR
+════════════════════════════════════════════════════════════════════════
+
+✓ vMix está en: 192.168.192.140:8098
+  → Verificar en TrueNAS: curl -s http://192.168.192.140:8098/api/ | head -5
+
+✓ Nginx configurado correctamente
+  → Ver: sudo nginx -t
+
+✓ Python venv creado
+  → Ver: ls -la /opt/vmix-schedule-44/venv/
+
+✓ Servicios habilitados
+  → Ver: sudo systemctl is-enabled vmix-schedule-44
+
+✓ Puertos 80 y 5000 disponibles
+  → Ver: sudo netstat -tuln | grep -E ':(80|5000)'
+
+✓ Archivos de datos inicializados
+  → Ver: ls -la /opt/vmix-schedule-44/data/
+
+
+🎨 INTERFAZ WEB - VISTA PREVIA
+════════════════════════════════════════════════════════════════════════
+
+┌─────────────────────────────────────────────────────────────────────┐
+│  🎬 vMix Schedule 44                         ● Conectado           │
+│  Control Panel - TrueNAS Server                                     │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│  📺 Monitor                          ⚙️  Control                    │
+│  Entrada: 3                          [AUTO: OFF] (clickable)        │
+│  Hora: 19:30:45                      Estado: Conectado             │
+│  Estado: ✅ AUTO ON                                                 │
+│                                                                     │
+│  Eventos | Logs                                                    │
+│  ─────────────────────────────────────────────────────────────────│
+│  📅 Eventos                                                         │
+│  Día: [Monday      ]                                               │
+│  Hora: [14:30     ]                                                │
+│  Input: [1        ]                                                │
+│  [Agregar]                                                         │
+│                                                                     │
+│  Día      │ Hora    │ Input │ Acción                              │
+│  ─────────┼─────────┼───────┼─────────────                        │
+│  Monday   │ 14:30   │ 1     │ [Eliminar]                          │
+│  Tuesday  │09:00   │ 5     │ [Eliminar]                          │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+
+
+🔍 ARCHIVOS GENERADOS
+════════════════════════════════════════════════════════════════════════
+
+En /Users/ignaciomanuelcenteno/Documents/PROG/2025/CANAL44_RCUPLAY/scheduletv/deploy/:
+
+✅ api.py                           (10.2 KB, Backend Python)
+✅ frontend/index.html              (18 KB, Interfaz web)
+✅ requirements.txt                 (Dependencias Python)
+✅ nginx.conf                       (Configuración Nginx)
+✅ deploy.sh                        (Script instalación original)
+✅ deploy_to_truenas.sh             (Deploy remoto desde Mac)
+✅ deploy_truenas_allinone.sh       (Script todo-en-uno)
+✅ DEPLOY_DESDE_TRUENAS.txt         (Instrucciones alternativas)
+✅ INSTRUCCIONES_SHELL_TRUENAS.txt  (Instrucciones paso a paso)
+✅ VERIFICACION_FINAL.md            (Checklist de verificación)
+✅ README_DEPLOY.md                 (Documentación completa)
+
+
+📝 DATOS PERSISTENTES
+════════════════════════════════════════════════════════════════════════
+
+En /opt/vmix-schedule-44/data/ (TrueNAS):
+
+vMix_Schedule_44_Contenidos_Config.json
+─────────────────────────────────────────
+{
+  "PUBLIS_POR_BLOQUE": 4,
+  "INICIO_PUBLIS_INPUT": "14",
+  "PUBLIS_LISTA_ID": "15",
+  "CIERRE_PUBLIS_INPUT": "16",
+  "FADE_DURATION_MS": 500,
+  "PUBLIS_CLIP_TIMEOUT": 300,
+  "INICIO_PUBLIS_TIMEOUT": 11,
+  "CIERRE_PUBLIS_TIMEOUT": 5,
+  "VMIX_HOST": "192.168.192.140",
+  "VMIX_PORT": 8098
+}
+
+vMix_Schedule_44_Contenidos_DB.json
+───────────────────────────────────
+{
+  "programas": {
+    "Monday": [
+      {"time": "14:30:00", "name": "1"}
+    ]
+  },
+  "tandas": {}
+}
+
+
+🎯 PRÓXIMOS PASOS DESPUÉS DEL DEPLOY
+════════════════════════════════════════════════════════════════════════
+
+1. Abrir http://192.168.192.44/ui/ en navegador
+2. Verificar que muestre "vMix Conectado" (punto verde)
+3. Agregar primer evento de prueba
+4. Activar AUTO: ON
+5. Verificar que se ejecute automáticamente
+6. Monitorear logs en pestaña "Logs"
+7. Agregar eventos reales según programación
+
+
+📞 SOPORTE - TROUBLESHOOTING
+════════════════════════════════════════════════════════════════════════
+
+PROBLEMA: "vMix Desconectado"
+→ Solución: Verificar que vMix esté en 192.168.192.140:8098
+   curl -s http://192.168.192.140:8098/api/ | head -5
+
+PROBLEMA: "No se puede conectar a http://192.168.192.44/ui/"
+→ Solución: Verificar que Nginx está corriendo
+   sudo systemctl status nginx
+   sudo systemctl restart nginx
+
+PROBLEMA: Los eventos no se ejecutan
+→ Solución: Verificar AUTO está ON y sincronización horaria
+   date (verificar hora en TrueNAS)
+   sudo tail -f /opt/vmix-schedule-44/logs/api.log
+
+PROBLEMA: Error de permisos
+→ Solución: Ajustar permisos
+   sudo chown -R root:root /opt/vmix-schedule-44
+   sudo chmod -R 755 /opt/vmix-schedule-44
+
+PROBLEMA: Servicio se reinicia constantemente
+→ Solución: Ver logs
+   sudo systemctl status vmix-schedule-44 -l
+   sudo tail -100 /opt/vmix-schedule-44/logs/api.log
+
+
+═══════════════════════════════════════════════════════════════════════
+
+✨ vMix Schedule 44 v1.0 - Powered by IGNACE
+   Deploy profesional en TrueNAS - Lista para producción
+
+═══════════════════════════════════════════════════════════════════════
