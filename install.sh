@@ -142,6 +142,10 @@ if [ -n "$API_FILE" ]; then
     API_DIR="$(dirname $API_FILE)"
     API_MOD="api"
 
+    # Detener servicio anterior antes de reescribir el unit file
+    systemctl stop vmix-schedule-44 2>/dev/null || true
+    sleep 1
+
     cat > /etc/systemd/system/vmix-schedule-44.service << EOF
 [Unit]
 Description=vMix Schedule 44 - Web API
@@ -164,7 +168,7 @@ EOF
 
     systemctl daemon-reload
     systemctl enable vmix-schedule-44 2>/dev/null || true
-    systemctl start vmix-schedule-44 && echo "   ✅ Servicio iniciado" || {
+    systemctl restart vmix-schedule-44 && echo "   ✅ Servicio iniciado" || {
         echo "   ⚠️  No se pudo iniciar. Ver logs:"
         echo "      tail -f $INSTALL_DIR/logs/api.log"
     }
