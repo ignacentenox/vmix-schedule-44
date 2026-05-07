@@ -40,12 +40,22 @@ def get_vmix_url():
             with open(VMIX_CONFIG_FILE, 'r') as f:
                 url = f.read().strip()
                 if url:
-                    return url
+                    # Normalizar: quitar /api/ al final si existe
+                    url = url.rstrip('/')
+                    if url.endswith('/api'):
+                        url = url.replace('/api', '')
+                    return url + '/'
         except:
             pass
-    return 'http://192.168.192.140:8098/api/'
+    # Default: sin /api/
+    return 'http://192.168.192.140:8098/'
 
 VMIX_URL = get_vmix_url()
+
+# --- HELPER: Obtener URL actual (recargada en tiempo real) ---
+def get_current_vmix_url():
+    """Obtiene la URL de vMix actual (recarga si cambió)."""
+    return get_vmix_url()
 
 # Variables globales
 _tanda_lock = threading.Lock()
@@ -77,13 +87,14 @@ def log(msg):
 # --- VMIX API HELPERS ---
 def call_vmix(func, retries=2, backoff=1.5, **kwargs):
     """Llama API vMix con reintentos exponenciales."""
+    url = get_current_vmix_url()  # Usar URL actual
     query = {'Function': func}
     query.update(kwargs)
     attempt = 0
     delay = 1.0
     while attempt <= retries:
         try:
-            r = requests.get(VMIX_URL, params=query, timeout=3)
+            r = requests.get(url, params=query, timeout=3)
             if 200 <= r.status_code < 500:
                 return r
             if 'No suitable Function' in r.text:
@@ -265,10 +276,10 @@ def api_status():
 @app.route('/api/config', methods=['GET', 'POST'])
 def api_config():
     """Obtiene/guarda configuración."""
-    global config, VMIX_URL
+    global config
     if request.method == 'GET':
         cfg = config.copy()
-        cfg['VMIX_URL'] = VMIX_URL
+        cfg['VMIX_URL'] = get_current_vmix_url()
         return jsonify(cfg)
     else:
         data = request.get_json()
@@ -277,7 +288,12 @@ def api_config():
         if 'VMIX_URL' in data:
             new_url = data['VMIX_URL'].strip()
             if new_url:
-                VMIX_URL = new_url
+                # Normalizar URL
+                new_url = new_url.rstrip('/')
+                if new_url.endswith('/api'):
+                    new_url = new_url.replace('/api', '')
+                new_url = new_url + '/'
+                
                 with open(VMIX_CONFIG_FILE, 'w') as f:
                     f.write(new_url)
                 log(f"[CONFIG] URL de vMix cambiada a: {new_url}")
@@ -293,20 +309,22 @@ def api_config():
 
 @app.route('/api/vmix/test', methods=['GET'])
 def api_vmix_test():
-    """Verifica conectividad a vMix con diagnóstico detallado."""
+    """Diagnóstico completo de conectividad a vMix."""
     import socket
     
-    # Extraer host y puerto de la URL
+    vmix_url = get_current_vmix_url()  # URL actual
+    
+    # Extraer host y puerto
     try:
         from urllib.parse import urlparse
-        parsed = urlparse(VMIX_URL)
+        parsed = urlparse(vmix_url)
         host = parsed.hostname or parsed.netloc.split(':')[0]
         port = parsed.port or 8098
     except:
         host = "?"
         port = "?"
     
-    # Intentar ping/resolución DNS
+    # DNS
     dns_result = "?"
     try:
         ip = socket.gethostbyname(host)
@@ -316,45 +334,86 @@ def api_vmix_test():
     except Exception as e:
         dns_result = f"✗ {str(e)}"
     
-    # Intentar conexión a vMix
+    # Test 1: Conectar a la URL raíz
+    diagnostics = []
     try:
-        r = requests.get(VMIX_URL, params={'Function': 'GetStatus'}, timeout=2)
-        if r.status_code == 200:
-            return jsonify({
-                "status": "conectado", 
-                "url": VMIX_URL,
-                "dns": dns_result,
-                "response_code": r.status_code
-            })
-        else:
-            return jsonify({
-                "status": "error", 
-                "url": VMIX_URL,
-                "dns": dns_result,
-                "response_code": r.status_code, 
-                "error": r.text[:200]
-            })
+        r = requests.get(vmix_url.rstrip('/'), timeout=2)
+        diagnostics.append(f"✓ Conecta a {vmix_url} (HTTP {r.status_code})")
+        diagnostics.append(f"  Respuesta: {r.text[:100]}")
     except requests.ConnectionError as e:
+        diagnostics.append(f"✗ No conecta a {vmix_url}")
+        diagnostics.append(f"  Error: {str(e)[:100]}")
         return jsonify({
-            "status": "connection_error", 
-            "url": VMIX_URL,
+            "status": "connection_error",
+            "url": vmix_url,
             "dns": dns_result,
-            "error": f"No conecta a {host}:{port}"
+            "diagnostics": diagnostics,
+            "error": "Imposible conectar al servidor"
         })
     except requests.Timeout:
+        diagnostics.append(f"✗ Timeout conectando a {vmix_url}")
         return jsonify({
-            "status": "timeout", 
-            "url": VMIX_URL,
+            "status": "timeout",
+            "url": vmix_url,
             "dns": dns_result,
-            "error": f"Timeout (3s) conectando a {host}:{port}"
+            "diagnostics": diagnostics
         })
     except Exception as e:
+        diagnostics.append(f"✗ Error: {str(e)[:100]}")
         return jsonify({
-            "status": "error", 
-            "url": VMIX_URL,
+            "status": "error",
+            "url": vmix_url,
             "dns": dns_result,
+            "diagnostics": diagnostics,
             "error": str(e)
         })
+    
+    # Test 2: Probar con GetStatus
+    try:
+        r = requests.get(vmix_url, params={'Function': 'GetStatus'}, timeout=2)
+        if r.status_code == 200 and "No suitable Function" not in r.text:
+            diagnostics.append(f"✓ GetStatus respondió (HTTP 200)")
+            return jsonify({
+                "status": "conectado",
+                "url": vmix_url,
+                "dns": dns_result,
+                "diagnostics": diagnostics,
+                "vmix_response": r.text[:200]
+            })
+        else:
+            diagnostics.append(f"⚠ GetStatus HTTP {r.status_code}")
+            if "No suitable Function" in r.text:
+                diagnostics.append("  ℹ️  'No suitable Function' - Probando sin /api/...")
+                
+                # Intentar sin /api/
+                url_sin_api = vmix_url.replace('/api/', '/')
+                try:
+                    r2 = requests.get(url_sin_api, params={'Function': 'GetStatus'}, timeout=2)
+                    if "No suitable Function" not in r2.text:
+                        diagnostics.append(f"  ✓ Funciona con: {url_sin_api}")
+                        diagnostics.append("  → Actualiza la URL en la configuración")
+                except:
+                    pass
+            else:
+                diagnostics.append(f"  Respuesta: {r.text[:150]}")
+    except Exception as e:
+        diagnostics.append(f"⚠ GetStatus falló: {str(e)[:100]}")
+    
+    # Test 3: Probar raíz sin parámetros
+    try:
+        r = requests.get(vmix_url.rstrip('/'), timeout=2)
+        diagnostics.append(f"✓ URL raíz responde")
+        if r.text.strip():
+            diagnostics.append(f"  Tipo: {r.headers.get('Content-Type', '?')}")
+    except:
+        pass
+    
+    return jsonify({
+        "status": "conectando",
+        "url": vmix_url,
+        "dns": dns_result,
+        "diagnostics": diagnostics
+    })
 
 @app.route('/api/db', methods=['GET'])
 def api_db():

@@ -439,8 +439,8 @@
     <div class="container">
         <div class="config-panel">
             <div class="config-group" style="flex: 1; flex-direction: column; gap: 4px;">
-                <label>📡 VMIX URL (ZeroTier/LAN):</label>
-                <input type="text" id="cfg-vmix" placeholder="http://192.168.192.140:8098/api/" style="width: 100%; padding: 6px;">
+				<label>📡 VMIX URL:</label>
+				<input type="text" id="cfg-vmix" placeholder="http://192.168.192.140:8098/" style="width: 100%; padding: 6px;">
             </div>
             <div class="config-group">
                 <label>SPOTS:</label>
@@ -594,14 +594,19 @@
 			async function testVmix() {
             const result = await fetch('/api/vmix/test').then(r => r.json());
             
-            let msg = `URL: ${result.url}\n`;
-            msg += `DNS: ${result.dns || '?'}\n`;
+				let msg = `📡 URL: ${resu										msg += `🌐 DNS: ${result.dns}\n`;
+				msg += `━━━━━━━━━━━━━━━━━━								if (result.diagnostics && result.diagnostics.length > 0) {
+					msg += result.d						oin('\n') + '\n';
+				}
             
             if (result.status === 'conectado') {
                 alert('✅ vMix CONECTADO\n\n' + msg);
+			} else if (result.					connection_error') {
+				alert('❌ NO SE CONECTA\n\n' + msg + '\nVerifica firewall y que vMix esté corriendo');
+			} else if (re					=== 'timeout') {
+								️ T				OUT\n\n' + msg + '\nLa red e					o vMix no responde');
             } else {
-                msg += `\nError: ${result.error || 'Desconocido'}`;
-                alert('❌ vMix NO CONECTA\n\n' + msg);
+				alert('⚠️ DIAGNÓSTIg);
             }
         }
         async function updateStatus() {
