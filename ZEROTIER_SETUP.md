@@ -5,8 +5,11 @@ Si el servidor TrueNAS está conectado a VPN/ZeroTier para acceder a vMix, sigue
 ## 📌 Configuración actual
 
 **IP de vMix (por VPN):** `192.168.192.140:8098`
+**Endpoint correcto:** `http://192.168.192.140:8098/` (SIN `/api/`)
 
-Esta IP ya está **preconfigurada por defecto** en el sistema.
+⚠️ **IMPORTANTE:** La URL NO debe incluir `/api/` al final - vMix no reconoce ese endpoint.
+
+Esta configuración ya está **preconfigurada por defecto** en el sistema.
 
 ## ✅ Verificar conexión
 
@@ -17,36 +20,42 @@ Esta IP ya está **preconfigurada por defecto** en el sistema.
 
 ## 🔍 Si necesitas cambiar la IP
 
-1. En el campo **"📡 VMIX URL (ZeroTier/LAN):"** ingresa la nueva dirección
+1. En el campo **"📡 VMIX URL:"** ingresa la nueva dirección:
+   - ✅ Correcto: `http://10.147.X.X:8098/` o `http://192.168.X.X:8098/`
+   - ❌ Incorrecto: `http://10.147.X.X:8098/api/` (no agregar /api/)
+
 2. Presiona **APLICAR**
 3. Presiona **🔧 TEST** para verificar
 
-## 🛠️ Diagnóstico detallado
+El sistema normaliza automáticamente la URL y quita `/api/` si lo incluyes.
 
-El botón TEST muestra:
-- **URL:** La dirección que está usando
-- **DNS:** Si la IP resuelve correctamente  
-- **Error:** Razón específica si falla
+## 🛠️ Diagnóstico desde línea de comandos
 
-### Causas comunes de error:
-
-| Error | Causa | Solución |
-|-------|-------|----------|
-| `Connection refused` | vMix no está corriendo | Verifica que vMix esté ejecutándose |
-| `timeout` | Red VPN lenta o caída | Verifica conexión VPN/ZeroTier |
-| `error... No suitable Function` | vMix conecta pero URL mal | Verifica `/api/` al final de URL |
-
-## 📋 Verificar desde TrueNAS (SSH)
-
+En TrueNAS (SSH):
 ```bash
-# Probar conectividad a vMix
-curl http://192.168.192.140:8098/api/?Function=GetStatus
+# Script automático completo
+bash /mnt/vmix-schedule-44/test-vmix-connection.sh
 
-# Ver logs de la API
-tail -f /mnt/vmix-schedule-44/logs/api.log
+# O pruebas manuales:
+curl http://192.168.192.140:8098/?Function=GetStatus
 ```
+
+## 📋 Respuesta esperada de vMix
+
+La API de vMix devuelve XML:
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<vmix>
+  <version>23.x.x.x</version>
+  <edition>...</edition>
+  ...
+</vmix>
+```
+
+Si ves "No suitable Function" significa que la URL `/api/` está incorrecta.
 
 ---
 
-**Sistema preconfigurado y listo. La URL `http://192.168.192.140:8098/api/` ya está activa.**
+**Sistema preconfigurado y listo. URL: `http://192.168.192.140:8098/` (sin /api/)**
+
 
