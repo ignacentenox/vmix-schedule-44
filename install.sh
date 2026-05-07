@@ -89,27 +89,23 @@ if ! $PY_CMD -m pip --version >/dev/null 2>&1; then
         echo "❌ No se pudo descargar get-pip.py"
         exit 1
     }
-    $PY_CMD /tmp/get-pip.py --target="$LIB_DIR" 2>&1 | tail -3
+    $PY_CMD /tmp/get-pip.py --target="$LIB_DIR" 2>&1 | tail -2
     rm -f /tmp/get-pip.py
 fi
 
 # Instalar dependencias con --target (no necesita permisos del sistema)
+# Usar PYTHONPATH para que pip recién instalado sea encontrado
 echo "   Instalando en: $LIB_DIR"
-$PY_CMD -m pip install --target="$LIB_DIR" $PKGS 2>&1 | grep -E "(Successfully|already|error|ERROR)" || true
+PYTHONPATH="$LIB_DIR" $PY_CMD -m pip install --target="$LIB_DIR" --quiet $PKGS 2>&1 | grep -E "(Successfully|already|error|ERROR)" || true
 
 # Verificar que flask quedó instalado
-if $PY_CMD -c "import sys; sys.path.insert(0,'$LIB_DIR'); import flask" 2>/dev/null; then
+if PYTHONPATH="$LIB_DIR" $PY_CMD -c "import flask" 2>/dev/null; then
     echo "   ✅ Dependencias instaladas correctamente"
 else
     echo "❌ Error instalando dependencias. Salida completa:"
-    $PY_CMD -m pip install --target="$LIB_DIR" $PKGS
+    PYTHONPATH="$LIB_DIR" $PY_CMD -m pip install --target="$LIB_DIR" $PKGS
     exit 1
 fi
-
-# Gunicorn
-GUNICORN_CMD="$PY_CMD -c \"import sys; sys.path.insert(0,'$LIB_DIR'); from gunicorn.app.wsgiapp import run; run()\" -- -b 127.0.0.1:5000"
-# Forma más simple: usar gunicorn como módulo con PYTHONPATH
-GUNICORN_CMD="PYTHONPATH=$LIB_DIR $PY_CMD -m gunicorn"
 if [ -z "$GUNICORN_CMD" ]; then
     GUNICORN_CMD="$PY_CMD -m gunicorn"
 fi
