@@ -39,10 +39,24 @@ echo ""
 echo "[2/6] Descargando desde GitHub..."
 cd "$INSTALL_DIR"
 
-if [ -f "$INSTALL_DIR/deploy/api.py" ]; then
-    echo "   ✅ Código ya descargado, saltando..."
+if [ -d "$INSTALL_DIR/.git" ]; then
+    echo "   Actualizando código (git pull)..."
+    git -C "$INSTALL_DIR" pull --ff-only 2>&1 | tail -2 && echo "   ✅ Código actualizado" || echo "   ⚠️  git pull falló, usando código existente"
+elif [ -f "$INSTALL_DIR/deploy/api.py" ]; then
+    echo "   Reinstalando: borrando código anterior..."
+    rm -rf "$INSTALL_DIR/deploy" "$INSTALL_DIR/install.sh" "$INSTALL_DIR/README.md" 2>/dev/null || true
+    git clone --depth 1 https://github.com/ignacentenox/vmix-schedule-44.git . 2>/dev/null && echo "   ✅ Clonado con git" || {
+        echo "   Intentando wget..."
+        wget -q -O /tmp/vmix.tar.gz "https://github.com/ignacentenox/vmix-schedule-44/archive/refs/heads/main.tar.gz" || {
+            echo "❌ No se pudo descargar. Verifica internet."
+            exit 1
+        }
+        tar -xzf /tmp/vmix.tar.gz -C /tmp/
+        cp -r /tmp/vmix-schedule-44-main/. "$INSTALL_DIR/"
+        rm -rf /tmp/vmix.tar.gz /tmp/vmix-schedule-44-main
+        echo "   ✅ Descargado con wget"
+    }
 else
-    # Intentar git clone
     git clone --depth 1 https://github.com/ignacentenox/vmix-schedule-44.git . 2>/dev/null && echo "   ✅ Clonado con git" || {
         echo "   Intentando wget..."
         wget -q -O /tmp/vmix.tar.gz "https://github.com/ignacentenox/vmix-schedule-44/archive/refs/heads/main.tar.gz" || {
@@ -62,8 +76,8 @@ echo "[3/6] Detectando Python..."
 PY_CMD=""
 for py in python3.11 python3.10 python3.9 python3; do
     if command -v "$py" >/dev/null 2>&1; then
-        PY_CMD="$py"
-        echo "   ✅ Encontrado: $PY_CMD ($($py --version 2>&1))"
+        PY_CMD="$(command -v $py)"
+        echo "   ✅ Encontrado: $PY_CMD ($($PY_CMD --version 2>&1))"
         break
     fi
 done
@@ -173,7 +187,18 @@ echo "Estado:  systemctl status vmix-schedule-44"
 echo "Reiniciar: systemctl restart vmix-schedule-44"
 echo ""
 
-sleep 2
+sleep 3
 systemctl is-active --quiet vmix-schedule-44 \
-    && echo "✅ Servicio corriendo OK" \
-    || echo "⚠️  Servicio no activo. Ver: tail -f $INSTALL_DIR/logs/api.log"
+    && echo "✅ Servicio activo" \
+    || echo "⚠️  Servicio no activo"
+
+# Verificar que el puerto 8080 está escuchando
+if command -v curl >/dev/null 2>&1; then
+    echo "   Verificando puerto 8080..."
+    if curl -sf http://127.0.0.1:8080/api/status >/dev/null 2>&1; then
+        echo "✅ Puerto 8080 respondiendo OK"
+    else
+        echo "⚠️  Puerto 8080 no responde aún. Logs:"
+        tail -20 "$INSTALL_DIR/logs/api.log" 2>/dev/null || journalctl -u vmix-schedule-44 -n 20 --no-pager 2>/dev/null || true
+    fi
+fi
