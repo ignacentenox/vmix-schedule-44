@@ -59,29 +59,25 @@ sudo systemctl restart vmix-schedule-44
 Abre en el navegador: **http://192.168.192.44:8080**
 
 ### 2. Configurar URL de vMix
-En la sección de configuración (parte superior):
 
-1. **Campo "VMIX URL"** - Ingresa la dirección de tu servidor vMix:
-   - Ejemplo: `http://192.168.192.140:8098/api/`
+1. **Campo "📡 VMIX URL"** - Ingresa la dirección de tu servidor vMix:
+   - ✅ Correcto: `http://192.168.192.140:8098/`
+   - ❌ Incorrecto: `http://192.168.192.140:8098/api/` (sin /api/)
    - Donde `192.168.192.140` es la IP de tu servidor vMix
    - Puerto típico: `8098` (vMix API HTTP)
 
-2. **Encontrar URL correcta de vMix:**
-   - Abre vMix en la máquina que lo ejecuta
+2. **Encontrar IP correcta de vMix:**
+   - Abre vMix en Windows/Linux
    - Menu → `Tools` → `Web Controller`
    - Verás algo como: `http://localhost:8098` o `http://192.168.x.x:8098`
-   - Reemplaza `localhost` con la IP de la máquina
-   - Agrega `/api/` al final
+   - Copia esa dirección (sin `/api/`)
 
 3. **Presiona APLICAR** - Se guardará automáticamente
 
 ### 3. Verificar conectividad
-- Presiona el botón **🔧 TEST VMIX**
-- Si dice "✅ vMix CONECTADO" → Listo!
-- Si dice "❌ No conecta" → Revisa:
-  - IP y puerto correctos
-  - vMix está ejecutándose
-  - Firewall permite conexión entre TrueNAS y vMix
+- Presiona el botón **🔧 TEST** en configuración
+- Si dice "✅ Conectado" → ¡Listo!
+- Si dice "❌ No conecta" → Revisa logs o ejecuta diagnóstico
 
 ---
 
@@ -118,28 +114,35 @@ curl http://192.168.192.44:8080/api/status
 
 ## 🛠️ Troubleshooting
 
+### Diagnóstico automático completo
+```bash
+# Ejecutar script en TrueNAS (SSH)
+bash /mnt/vmix-schedule-44/test-vmix-connection.sh
+```
+
+### vMix no conecta
+1. Verifica que vMix esté ejecutándose en Windows/Linux
+2. Confirma la URL correcta (sin `/api/`):
+   ```bash
+   curl http://192.168.192.140:8098/?Function=GetStatus
+   ```
+3. Si eso devuelve XML → IP/puerto correctos, verifica firewall/VPN
+4. Si dice "No suitable Function" → URL tiene `/api/`, quítalo
+
+### Cambiar URL de vMix
+- Simplemente ingresa la nueva URL en el campo "📡 VMIX URL"
+- Presiona APLICAR
+- No necesita reiniciar nada
+
 ### Puerto 8080 no responde
 ```bash
 # Verificar si el servicio está activo
 sudo systemctl restart vmix-schedule-44
 sudo systemctl status vmix-schedule-44
 
-# Revisar logs
-sudo journalctl -u vmix-schedule-44 -n 50
+# Ver logs en tiempo real
+sudo journalctl -u vmix-schedule-44 -f
 ```
-
-### vMix sigue sin conectar
-1. Verifica que vMix esté ejecutándose en la máquina correcta
-2. Desde TrueNAS, prueba conectividad manual:
-   ```bash
-   curl http://192.168.192.140:8098/api/?Function=GetStatus
-   ```
-3. Si eso falla, la IP o puerto es incorrecto
-
-### Cambiar URL de vMix después de instalar
-- Simplemente ingresa la nueva URL en el campo "VMIX URL"
-- Presiona APLICAR
-- No necesita reiniciar nada
 
 ---
 

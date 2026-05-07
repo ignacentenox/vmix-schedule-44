@@ -1,108 +1,102 @@
 # vMix Schedule 44
 
-Sistema de programación automática para vMix con interfaz web.
+Sistema de programación automativa para vMix con interfaz web REST API.
+Migración de PyQt desktop app → Flask web server para TrueNAS SCALE.
 
 ## 🚀 Instalación Rápida (TrueNAS)
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/ignacentenox/vmix-schedule-44/main/install.sh | sudo sh
+curl -sSL https://raw.githubusercontent.com/ignacentenox/vmix-schedule-44/main/install.sh | sudo bash
 ```
 
-Acceso: **http://192.168.192.44/ui/**
+**Acceso:** `http://192.168.192.44:8080`
 
 ## 📋 Requisitos
 
-- TrueNAS / FreeBSD / Linux
+- TrueNAS SCALE (Debian 12 based)
 - Python 3.9+
-- Nginx
+- Acceso a vMix API (por VPN/ZeroTier)
 
 ## ✨ Características
 
-- Monitor en tiempo real
-- Programación de eventos
-- Control automático
-- Tandas publicitarias
-- API REST
-- JSON persistencia
+✅ REST API con Flask
+✅ Web UI dark theme (dark/cyan)
+✅ Monitor en tiempo real de vMix
+✅ Programación de eventos (Programas)
+✅ Tandas publicitarias automáticas
+✅ Control de jingles de entrada/salida
+✅ Auto-arranque systemd
+✅ Logs en tiempo real
+✅ Base de datos JSON persistente
 
-## 📖 Documentación
+## 📖 Documentación Completa
 
-Ver archivo `install.sh` para detalles técnicos.
-
----
+Ver **`SETUP.md`** para instalación, configuración de vMix y troubleshooting.
 
 ## 🔌 API REST
 
-Endpoints disponibles:
-
 ```bash
-# Ver estado
-curl http://192.168.192.44/api/status
+# Estado del sistema
+curl http://192.168.192.44:8080/api/status
 
-# Obtener eventos
-curl http://192.168.192.44/api/events
+# Configuración
+curl http://192.168.192.44:8080/api/config
 
-# Agregar evento
-curl -X POST http://192.168.192.44/api/events \
-  -H "Content-Type: application/json" \
-  -d '{"day":"Monday","time":"14:30","name":"1"}'
+# Probar vMix conectividad
+curl http://192.168.192.44:8080/api/vmix/test
 
-# Activar/desactivar AUTO
-curl -X POST http://192.168.192.44/api/auto/toggle \
-  -H "Content-Type: application/json" \
-  -d '{"enabled":true}'
+# Obtener programas del día
+curl http://192.168.192.44:8080/api/events/programas/Lunes
 
 # Ver logs
-curl http://192.168.192.44/api/logs
+curl http://192.168.192.44:8080/api/logs
 ```
 
----
-
-## 🔧 Configuración
-
-### Archivo de Configuración
-
-`/opt/vmix-schedule-44/data/vMix_Schedule_44_Contenidos_Config.json`
-
-```json
-{
-  "VMIX_HOST": "192.168.192.140",
-  "VMIX_PORT": 8098,
-  "PUBLIS_POR_BLOQUE": 4,
-  "FADE_DURATION_MS": 500
-}
-```
-
-### Base de Datos de Eventos
-
-`/opt/vmix-schedule-44/data/vMix_Schedule_44_Contenidos_DB.json`
-
-```json
-{
-  "programas": {
-    "Monday": [
-      {"time": "14:30:00", "name": "1"}
-    ]
-  },
-  "tandas": {}
-}
-```
-
----
-
-## 🛠️ Comandos Útiles
+## 🔧 Scripts útiles
 
 ```bash
-# Ver estado del servicio
-sudo systemctl status vmix-schedule-44
-
-# Ver logs en vivo
-sudo tail -f /opt/vmix-schedule-44/logs/api.log
-
-# Reiniciar aplicación
+# Actualizar desde GitHub (en TrueNAS)
+cd /mnt/vmix-schedule-44
+sudo git pull origin main
 sudo systemctl restart vmix-schedule-44
 
-# Parar aplicación
+# Diagnosticar conectividad vMix
+bash /mnt/vmix-schedule-44/test-vmix-connection.sh
+
+# Ver logs en vivo
+sudo journalctl -u vmix-schedule-44 -f
+```
+
+## 📁 Estructura
+
+```
+deploy/
+├── api.py              # Flask REST API
+├── frontend/
+│   └── index.html      # Web UI
+├── data/               # Base de datos JSON
+└── lib/                # Dependencias (pip --target)
+
+install.sh             # Instalador automático
+update-truenas.sh      # Script de actualización
+test-vmix-connection.sh # Diagnóstico
+SETUP.md              # Guía completa
+```
+
+## 🎯 Configuración rápida
+
+1. **Instalar:** Ejecutar comando de instalación arriba
+2. **Acceder:** Abre `http://192.168.192.44:8080`
+3. **Configurar vMix:**
+   - Campo "📡 VMIX URL" ingresa `http://192.168.192.140:8098/` (tu IP)
+   - Presiona **TEST** para verificar
+   - Presiona **APLICAR**
+
+Ver `SETUP.md` para detalles completos.
+
+---
+
+**Desarrollado con ❤️ por IGNACE**
 sudo systemctl stop vmix-schedule-44
 
 # Iniciar aplicación
