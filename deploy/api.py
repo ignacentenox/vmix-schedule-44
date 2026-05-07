@@ -145,6 +145,8 @@ def vmix_monitor():
 
 # --- API ENDPOINTS ---
 @app.route('/', methods=['GET'])
+@app.route('/ui/', methods=['GET'])
+@app.route('/ui', methods=['GET'])
 def index():
     """Sirve el frontend."""
     return send_from_directory(os.path.join(BASE_DIR, 'frontend'), 'index.html')

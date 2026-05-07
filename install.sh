@@ -111,31 +111,10 @@ if [ -z "$GUNICORN_CMD" ]; then
 fi
 echo "   gunicorn: $GUNICORN_CMD"
 
-# ─── [5/6] Configurar Nginx ───────────────────────────────────────
+# ─── [5/6] Nginx omitido ─────────────────────────────────────────
 echo ""
-echo "[5/6] Configurando Nginx..."
-
-# Buscar nginx config dir
-NGINX_CONF_DIR=""
-for d in /etc/nginx/conf.d /usr/local/etc/nginx/conf.d /etc/nginx/sites-available; do
-    if [ -d "$d" ]; then
-        NGINX_CONF_DIR="$d"
-        break
-    fi
-done
-
-if [ -n "$NGINX_CONF_DIR" ]; then
-    SRC=""
-    [ -f "$INSTALL_DIR/deploy/nginx.conf" ] && SRC="$INSTALL_DIR/deploy/nginx.conf"
-    [ -f "$INSTALL_DIR/nginx.conf" ] && SRC="$INSTALL_DIR/nginx.conf"
-    if [ -n "$SRC" ]; then
-        cp "$SRC" "$NGINX_CONF_DIR/vmix-schedule-44.conf"
-        [ -d /etc/nginx/sites-enabled ] && ln -sf "$NGINX_CONF_DIR/vmix-schedule-44.conf" /etc/nginx/sites-enabled/vmix-schedule-44.conf 2>/dev/null || true
-        echo "   ✅ Nginx configurado en $NGINX_CONF_DIR"
-    fi
-else
-    echo "   ⚠️  Nginx no encontrado, saltando configuración"
-fi
+echo "[5/6] Nginx omitido (TrueNAS usa el puerto 80 para su web)"
+echo "   La app corre directamente en el puerto 8080"
 
 # ─── [6/6] Servicio systemd ───────────────────────────────────────
 echo ""
@@ -159,7 +138,7 @@ Type=simple
 User=root
 WorkingDirectory=$API_DIR
 Environment=PYTHONPATH=$LIB_DIR
-ExecStart=$PY_CMD -m gunicorn -b 127.0.0.1:5000 $API_MOD:app
+ExecStart=$PY_CMD -m gunicorn -b 0.0.0.0:8080 $API_MOD:app
 Restart=always
 RestartSec=10
 StandardOutput=append:$INSTALL_DIR/logs/api.log
@@ -179,8 +158,6 @@ else
     echo "   ⚠️  api.py no encontrado, servicio no creado"
 fi
 
-# Nginx
-nginx -t 2>/dev/null && (systemctl restart nginx 2>/dev/null || true) && echo "   ✅ Nginx reiniciado" || true
 
 # ─── RESULTADO ────────────────────────────────────────────────────
 echo ""
@@ -188,7 +165,7 @@ echo "╔═══════════════════════�
 echo "║  ✅ INSTALACIÓN COMPLETADA                                   ║"
 echo "╚═══════════════════════════════════════════════════════════════╝"
 echo ""
-echo "🌐 Web:     http://192.168.192.44/ui/"
+echo "🌐 Web:     http://192.168.192.44:8080/"
 echo "📍 Dir:     $INSTALL_DIR"
 echo "📊 Logs:    tail -f $INSTALL_DIR/logs/api.log"
 echo ""
