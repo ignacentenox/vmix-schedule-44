@@ -291,6 +291,22 @@ def api_config():
         log("[CONFIG] Configuración guardada")
         return jsonify({"status": "ok"})
 
+@app.route('/api/vmix/test', methods=['GET'])
+def api_vmix_test():
+    """Verifica conectividad a vMix."""
+    try:
+        r = requests.get(VMIX_URL, params={'Function': 'GetStatus'}, timeout=2)
+        if r.status_code == 200:
+            return jsonify({"status": "conectado", "url": VMIX_URL, "response_code": r.status_code})
+        else:
+            return jsonify({"status": "error", "url": VMIX_URL, "response_code": r.status_code, "error": r.text[:100]})
+    except requests.ConnectionError:
+        return jsonify({"status": "no_conecta", "url": VMIX_URL, "error": "Connection refused"})
+    except requests.Timeout:
+        return jsonify({"status": "timeout", "url": VMIX_URL, "error": "Request timeout"})
+    except Exception as e:
+        return jsonify({"status": "error", "url": VMIX_URL, "error": str(e)})
+
 @app.route('/api/db', methods=['GET'])
 def api_db():
     """Obtiene base de datos completa."""

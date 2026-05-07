@@ -455,6 +455,7 @@
                 <input type="number" id="cfg-cierre" value="16">
             </div>
             <button class="btn-save" onclick="saveConfig()">APLICAR</button>
+			<button class="btn-save" style="background: #333; margin-left: 10px;" onclick="testVmix()">🔧 TEST VMIX</button>
         </div>
 
         <div class="monitor">
@@ -589,6 +590,15 @@
             await fetch('/api/config', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(config) });
             alert('✅ Guardado');
         }
+
+			async function testVmix() {
+				const result = await fetch('/api/vmix/test').then(r => r.json());
+				if (result.status === 'conectado') {
+					alert('✅ vMix CONECTADO\n' + result.url);
+				} else {
+					alert('❌ vMix NO CONECTA\nURL: ' + result.url + '\nError: ' + result.error);
+				}
+			}
 
         async function updateStatus() {
             try {
