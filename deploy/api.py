@@ -293,19 +293,68 @@ def api_config():
 
 @app.route('/api/vmix/test', methods=['GET'])
 def api_vmix_test():
-    """Verifica conectividad a vMix."""
+    """Verifica conectividad a vMix con diagnóstico detallado."""
+    import socket
+    
+    # Extraer host y puerto de la URL
+    try:
+        from urllib.parse import urlparse
+        parsed = urlparse(VMIX_URL)
+        host = parsed.hostname or parsed.netloc.split(':')[0]
+        port = parsed.port or 8098
+    except:
+        host = "?"
+        port = "?"
+    
+    # Intentar ping/resolución DNS
+    dns_result = "?"
+    try:
+        ip = socket.gethostbyname(host)
+        dns_result = f"✓ {host} → {ip}"
+    except socket.gaierror:
+        dns_result = f"✗ No resolve: {host}"
+    except Exception as e:
+        dns_result = f"✗ {str(e)}"
+    
+    # Intentar conexión a vMix
     try:
         r = requests.get(VMIX_URL, params={'Function': 'GetStatus'}, timeout=2)
         if r.status_code == 200:
-            return jsonify({"status": "conectado", "url": VMIX_URL, "response_code": r.status_code})
+            return jsonify({
+                "status": "conectado", 
+                "url": VMIX_URL,
+                "dns": dns_result,
+                "response_code": r.status_code
+            })
         else:
-            return jsonify({"status": "error", "url": VMIX_URL, "response_code": r.status_code, "error": r.text[:100]})
-    except requests.ConnectionError:
-        return jsonify({"status": "no_conecta", "url": VMIX_URL, "error": "Connection refused"})
+            return jsonify({
+                "status": "error", 
+                "url": VMIX_URL,
+                "dns": dns_result,
+                "response_code": r.status_code, 
+                "error": r.text[:200]
+            })
+    except requests.ConnectionError as e:
+        return jsonify({
+            "status": "connection_error", 
+            "url": VMIX_URL,
+            "dns": dns_result,
+            "error": f"No conecta a {host}:{port}"
+        })
     except requests.Timeout:
-        return jsonify({"status": "timeout", "url": VMIX_URL, "error": "Request timeout"})
+        return jsonify({
+            "status": "timeout", 
+            "url": VMIX_URL,
+            "dns": dns_result,
+            "error": f"Timeout (3s) conectando a {host}:{port}"
+        })
     except Exception as e:
-        return jsonify({"status": "error", "url": VMIX_URL, "error": str(e)})
+        return jsonify({
+            "status": "error", 
+            "url": VMIX_URL,
+            "dns": dns_result,
+            "error": str(e)
+        })
 
 @app.route('/api/db', methods=['GET'])
 def api_db():
