@@ -30,7 +30,22 @@ LOG_FILE = os.path.join(LOGS_DIR, "api.log")
 os.makedirs(DATA_DIR, exist_ok=True)
 os.makedirs(LOGS_DIR, exist_ok=True)
 
-VMIX_URL = 'http://192.168.192.140:8098/api/'
+# Archivo para guardar URL de vMix
+VMIX_CONFIG_FILE = os.path.join(DATA_DIR, "vmix_url.txt")
+
+# Cargar URL de vMix desde archivo o usar default
+def get_vmix_url():
+    if os.path.exists(VMIX_CONFIG_FILE):
+        try:
+            with open(VMIX_CONFIG_FILE, 'r') as f:
+                url = f.read().strip()
+                if url:
+                    return url
+        except:
+            pass
+    return 'http://192.168.192.140:8098/api/'
+
+VMIX_URL = get_vmix_url()
 
 # Variables globales
 _tanda_lock = threading.Lock()
@@ -250,13 +265,30 @@ def api_status():
 @app.route('/api/config', methods=['GET', 'POST'])
 def api_config():
     """Obtiene/guarda configuración."""
-    global config
+    global config, VMIX_URL
     if request.method == 'GET':
-        return jsonify(config)
+        cfg = config.copy()
+        cfg['VMIX_URL'] = VMIX_URL
+        return jsonify(cfg)
     else:
-        config = request.get_json()
+        data = request.get_json()
+        
+        # Cambiar URL de vMix si viene en la request
+        if 'VMIX_URL' in data:
+            new_url = data['VMIX_URL'].strip()
+            if new_url:
+                VMIX_URL = new_url
+                with open(VMIX_CONFIG_FILE, 'w') as f:
+                    f.write(new_url)
+                log(f"[CONFIG] URL de vMix cambiada a: {new_url}")
+        
+        # Guardar resto de config
+        for key in data:
+            if key != 'VMIX_URL' and key in config:
+                config[key] = data[key]
+        
         save_config(config)
-        log("[CONFIG] Guardada configuración")
+        log("[CONFIG] Configuración guardada")
         return jsonify({"status": "ok"})
 
 @app.route('/api/db', methods=['GET'])

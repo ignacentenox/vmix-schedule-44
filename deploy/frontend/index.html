@@ -439,6 +439,10 @@
     <div class="container">
         <div class="config-panel">
             <div class="config-group">
+                <label>VMIX URL:</label>
+                <input type="text" id="cfg-vmix" placeholder="http://192.168.192.140:8098/api/" style="width: 250px;">
+            </div>
+            <div class="config-group">
                 <label>SPOTS:</label>
                 <input type="number" id="cfg-spots" min="1" max="20" value="4">
             </div>
@@ -571,12 +575,14 @@
         async function loadConfig() {
             const res = await fetch('/api/config');
             config = await res.json();
+            document.getElementById('cfg-vmix').value = config.VMIX_URL || 'http://192.168.192.140:8098/api/';
             document.getElementById('cfg-spots').value = config.PUBLIS_POR_BLOQUE || 4;
             document.getElementById('cfg-inicio').value = config.INICIO_PUBLIS_INPUT || 14;
             document.getElementById('cfg-cierre').value = config.CIERRE_PUBLIS_INPUT || 16;
         }
 
         async function saveConfig() {
+            config.VMIX_URL = document.getElementById('cfg-vmix').value.trim();
             config.PUBLIS_POR_BLOQUE = parseInt(document.getElementById('cfg-spots').value);
             config.INICIO_PUBLIS_INPUT = document.getElementById('cfg-inicio').value;
             config.CIERRE_PUBLIS_INPUT = document.getElementById('cfg-cierre').value;
