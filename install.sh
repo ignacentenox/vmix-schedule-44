@@ -130,6 +130,26 @@ echo ""
 echo "[5/6] Nginx omitido (TrueNAS usa el puerto 80 para su web)"
 echo "   La app corre directamente en el puerto 8080"
 
+# ─── [5.5/6] Importar base de datos y configuración ───────────────
+echo ""
+echo "[5.5/6] Importando configuración inicial..."
+
+# Copiar base de datos si existe en directorio raíz
+if [ -f "$INSTALL_DIR/vMix_Schedule_44_Contenidos_DB.json" ]; then
+    mkdir -p "$INSTALL_DIR/deploy/data"
+    cp "$INSTALL_DIR/vMix_Schedule_44_Contenidos_DB.json" "$INSTALL_DIR/deploy/data/"
+    echo "   ✅ Base de datos importada"
+fi
+
+# Copiar/crear archivo de configuración de vMix URL
+if [ -f "$INSTALL_DIR/deploy/data/vmix_url.txt" ]; then
+    echo "   ✅ URL vMix preconfigurada"
+else
+    mkdir -p "$INSTALL_DIR/deploy/data"
+    echo "http://192.168.192.140:8098/api/" > "$INSTALL_DIR/deploy/data/vmix_url.txt"
+    echo "   ℹ️  URL vMix configurada a default (puedes cambiarla en UI)"
+fi
+
 # ─── [6/6] Servicio systemd ───────────────────────────────────────
 echo ""
 echo "[6/6] Creando servicio systemd..."
